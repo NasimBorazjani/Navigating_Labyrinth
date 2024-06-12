@@ -1,0 +1,513 @@
+model: gpt_4 
+
+
+ID: 1
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'W'. Our task is to visit city A and city H excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from H and A, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  G D X N Y W A P V H \nG 0 0 0 0 0 0 0 0 0 1 \nD 0 0 0 0 0 0 0 1 0 0 \nX 1 0 0 0 1 1 0 0 0 0 \nN 0 0 0 0 0 1 1 0 0 1 \nY 0 0 1 1 0 0 1 0 0 0 \nW 0 0 1 0 0 0 0 0 0 0 \nA 1 1 1 0 0 0 0 0 1 0 \nP 1 0 0 0 1 0 0 0 0 1 \nV 1 0 0 0 0 0 0 1 0 0 \nH 1 1 0 1 0 0 1 1 0 0 \n", 'is_feasible': [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]], ['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H'], 'A', 'H'], 'is_correct': [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]], ['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H'], 'W', 'A', 'H'], 'Astar': ['[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]]', "['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H']", "['W']", "['A', 'H']"], 'opt': [['W', 'X', 'G', 'H', 'A', 'D', 'P', 'H', 'A'], 9, 0.020942211151123047]}
+Program returned None
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the puzzle, represented as 3x3 tuples
+   initial_state = 'W'
+   goal_state = ['A', 'H']   
+  
+   # Encoding other variables given in the problem statement
+   adjacency_matrix = {
+       'G': ['H'],
+       'D': ['P'],
+       'X': ['G', 'Y', 'W'],
+       'N': ['W', 'A', 'H'],
+       'Y': ['X', 'N', 'A'],
+       'W': ['X'],
+       'A': ['G', 'D', 'X', 'V', 'H'],
+       'P': ['G', 'Y', 'H'],
+       'V': ['G', 'P'],
+       'H': ['G', 'D', 'N', 'A', 'P']
+   }
+
+
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_state, adjacency_matrix, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial and goal board and dimensions of the puzzle board)
+   initial_state, goal_state, adjacency_matrix, visited_costs, queue = initialize()
+
+
+   # While there are un-visited states
+   while queue:
+       # Pop the state with the lowest sum of the cost so far and estimated cost to the goal from the queue
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if actions.count('A') == 2 and actions.count('H') == 2:
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes swapping any of the tiles neighboring the empty spot, with the empty spot
+       for next_city in adjacency_matrix[state]:
+           # The actions is valid, generate the new state
+           new_state = next_city
+           # The cost so far is the number of swaps made, as our objective is to minimize the number of swaps required to reach the goal state 
+           new_cost = g + 1
+          
+           # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+           if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+               visited_costs[new_state] = new_cost
+               heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [new_state], new_state))
+                  
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic is the sum of the Manhattan distances (the shortest path) of each tile from its goal position
+   # The heuristic relaxes the constraint that a tile can only be swapped with the empty spot and presumes we can move the tiles to their goal position by swapping them with any of the other tiles
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of moving a tile to a neighboring coordinate is always 1, which is exactly the decrease in the Manhattan distance, if the tile is moved toward its goal position, otherwise the estimated cost of the successor node is the same or higher, and he heuristic estimate for the goal state is 0, as the distance of each tile from its goal position would be 0 in the goal state.
+   h = 0
+   for goal_city in goal:
+       if state != goal_city:
+           h += 1
+   return h
+
+
+print(a_star())
+```
+
+This code uses the A* search algorithm to find the shortest path from city 'W' to visit cities 'A' and 'H' twice. The initialize function sets up the initial state, goal state, adjacency matrix, visited costs, and queue. The a_star function then uses these to find the shortest path. The heuristic function is used to estimate the cost to reach the goal from the current state. The solution is returned as a list of city names on the path.
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'D'. Our task is to visit city K and city Q excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from Q and K, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  S U X D I Z R M K Q \nS 0 0 0 0 1 0 0 0 0 1 \nU 0 0 1 0 0 0 0 0 0 0 \nX 0 0 0 0 0 0 1 0 1 0 \nD 0 1 0 0 0 1 0 0 0 0 \nI 0 1 0 0 0 0 0 0 0 1 \nZ 0 0 0 0 1 0 0 0 1 0 \nR 1 1 0 0 0 0 0 0 0 0 \nM 0 0 1 0 1 0 0 0 0 0 \nK 0 0 0 0 0 0 1 1 0 0 \nQ 0 1 0 1 1 1 0 0 1 0 \n", 'is_feasible': [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]], ['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q'], 'K', 'Q'], 'is_correct': [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]], ['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q'], 'D', 'K', 'Q'], 'Astar': ['[[0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]]', "['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q']", "['D']", "['K', 'Q']"], 'opt': [['D', 'Z', 'I', 'Q', 'K', 'R', 'S', 'Q', 'K'], 9, 0.027526378631591797]}
+Program returned None
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the puzzle, represented as 3x3 tuples
+   initial_state = 'D'
+   goal_state = ['K', 'Q']   
+  
+   # Encoding other variables given in the problem statement
+   adjacency_matrix = {
+       'S': ['I', 'Q'],
+       'U': ['X'],
+       'X': ['R', 'K'],
+       'D': ['U', 'Z'],
+       'I': ['U', 'Q'],
+       'Z': ['I', 'K'],
+       'R': ['S', 'U'],
+       'M': ['X', 'I'],
+       'K': ['R', 'M'],
+       'Q': ['U', 'D', 'I', 'Z', 'K']
+   }
+
+
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   # Record the swaps required to get to each state in a list; no swaps performed to reach the initial state
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_state, adjacency_matrix, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial and goal board and dimensions of the puzzle board)
+   initial_state, goal_state, adjacency_matrix, visited_costs, queue = initialize()
+
+
+   # While there are un-visited states
+   while queue:
+       # Pop the state with the lowest sum of the cost so far and estimated cost to the goal from the queue
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if all(actions.count(city) == 2 for city in goal_state):
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes moving to any of the cities neighboring the current city
+       for city in adjacency_matrix[state]:
+           # The actions is valid, generate the new state
+           new_state = city
+           # The cost so far is the number of moves made, as our objective is to minimize the number of moves required to reach the goal state 
+           new_cost = g + 1
+          
+           # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+           if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+               visited_costs[new_state] = new_cost
+               heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [new_state], new_state))
+                  
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic is the sum of the Manhattan distances (the shortest path) of each tile from its goal position
+   # The heuristic relaxes the constraint that a tile can only be swapped with the empty spot and presumes we can move the tiles to their goal position by swapping them with any of the other tiles
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of moving a tile to a neighboring coordinate is always 1, which is exactly the decrease in the Manhattan distance, if the tile is moved toward its goal position, otherwise the estimated cost of the successor node is the same or higher, and he heuristic estimate for the goal state is 0, as the distance of each tile from its goal position would be 0 in the goal state.
+   h = 0
+   for city in goal:
+       if state != city:
+           h += 1
+   return h
+
+
+print(a_star())
+```
+
+In this problem, we are given a map of cities and one-way roads connecting them. We are currently in city 'D' and we need to visit cities 'K' and 'Q' exactly twice. We can only visit each city once, except for 'K' and 'Q'. The goal is to find the quickest route that allows us to visit both these destination cities twice. The solution is provided as a list of the city names on our path, including the start. The A* search algorithm is used to find the shortest path. The heuristic function used is the sum of the Manhattan distances of each city from its goal position. This heuristic is admissible and consistent, as it never overestimates the cost to reach the goal state and the cost of moving a city to a neighboring coordinate is always 1, which is exactly the decrease in the Manhattan distance, if the city is moved toward its goal position.
+llm code run result: None
+
+
+
+ID: 3
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'M'. Our task is to visit city A and city R excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from R and A, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  O T I F A M X Y R G \nO 0 0 0 0 1 0 0 0 0 0 \nT 1 0 1 0 0 0 0 0 0 0 \nI 0 0 0 0 1 1 0 0 1 1 \nF 0 0 1 0 0 0 0 0 0 1 \nA 1 1 0 0 0 0 1 0 0 0 \nM 0 0 0 1 0 0 0 0 0 1 \nX 0 0 1 1 1 0 0 1 0 0 \nY 1 1 0 0 0 0 1 0 1 1 \nR 1 1 0 1 0 0 0 1 0 0 \nG 0 0 0 1 1 0 0 0 1 0 \n", 'is_feasible': [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1, 0, 0, 1, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 1], [0, 0, 1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 1, 0, 1, 1], [1, 1, 0, 1, 0, 0, 0, 1, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1, 0]], ['O', 'T', 'I', 'F', 'A', 'M', 'X', 'Y', 'R', 'G'], 'A', 'R'], 'is_correct': [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1, 0, 0, 1, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 1], [0, 0, 1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 1, 0, 1, 1], [1, 1, 0, 1, 0, 0, 0, 1, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1, 0]], ['O', 'T', 'I', 'F', 'A', 'M', 'X', 'Y', 'R', 'G'], 'M', 'A', 'R'], 'Astar': ['[[0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1, 0, 0, 1, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 1], [0, 0, 1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 1, 0, 1, 1], [1, 1, 0, 1, 0, 0, 0, 1, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1, 0]]', "['O', 'T', 'I', 'F', 'A', 'M', 'X', 'Y', 'R', 'G']", "['M']", "['A', 'R']"], 'opt': [['M', 'G', 'R', 'Y', 'R', 'O', 'A', 'X', 'A'], 9, 0.0287935733795166]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_3.py", line 86, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_3.py", line 64, in a_star
+    heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [new_state], new_state))
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_3.py", line 80, in heuristic
+    goal_row, goal_col = [(x, y) for x in range(len(goal)) for y in range(len(goal[x])) if goal[x][y] == state[i][j]][0]
+IndexError: list index out of range
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the puzzle, represented as 3x3 tuples
+   initial_state = 'M'
+   goal_state = ['A', 'R', 'A', 'R']   
+  
+   # Encoding other variables given in the problem statement
+   adjacency_matrix = {
+       'O': ['A'],
+       'T': ['O', 'I'],
+       'I': ['A', 'M', 'R', 'G'],
+       'F': ['I', 'G'],
+       'A': ['O', 'T', 'X'],
+       'M': ['F', 'G'],
+       'X': ['I', 'F', 'A', 'Y'],
+       'Y': ['O', 'T', 'X', 'R', 'G'],
+       'R': ['O', 'T', 'F', 'Y'],
+       'G': ['F', 'A', 'R']
+   }
+
+
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_state, adjacency_matrix, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial and goal board and dimensions of the puzzle board)
+   initial_state, goal_state, adjacency_matrix, visited_costs, queue = initialize()
+
+
+   # While there are un-visited states
+   while queue:
+       # Pop the state with the lowest sum of the cost so far and estimated cost to the goal from the queue
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if actions == goal_state:
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes swapping any of the tiles neighboring the empty spot, with the empty spot
+       # Generate the coordinates of the tiles neighboring "_"
+       for next_city in adjacency_matrix[state]:
+           # The actions is valid, generate the new state
+           new_state = next_city
+           # The cost so far is the number of swaps made, as our objective is to minimize the number of swaps required to reach the goal state 
+           new_cost = g + 1
+          
+           # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+           if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+               visited_costs[new_state] = new_cost
+               heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [new_state], new_state))
+                  
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic is the sum of the Manhattan distances (the shortest path) of each tile from its goal position
+   # The heuristic relaxes the constraint that a tile can only be swapped with the empty spot and presumes we can move the tiles to their goal position by swapping them with any of the other tiles
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of moving a tile to a neighboring coordinate is always 1, which is exactly the decrease in the Manhattan distance, if the tile is moved toward its goal position, otherwise the estimated cost of the successor node is the same or higher, and he heuristic estimate for the goal state is 0, as the distance of each tile from its goal position would be 0 in the goal state.
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[i])):
+           # Can't compare integers with "_" when finding the goal position of each tile, thus ignore the "_" tile
+           if state[i][j] != '_':
+               # Get goal position of each tile
+               goal_row, goal_col = [(x, y) for x in range(len(goal)) for y in range(len(goal[x])) if goal[x][y] == state[i][j]][0]
+               # Add the the Manhattan distance of the current and goal coordinates of the tile to the estimate
+               h += abs(i - goal_row) + abs(j - goal_col)
+   return h
+
+
+print(a_star())
+```
+
+This problem is a bit tricky because it requires visiting two cities twice. The A* algorithm is implemented in a generic way, with the heuristic function being the only part that is specific to the problem. The heuristic function is used to estimate the remaining cost to reach the goal state from the current state. In this case, the heuristic function is the sum of the Manhattan distances of each tile from its goal position. The Manhattan distance is the shortest path between two points in a grid-based system, calculated as the sum of the absolute differences in their x and y coordinates. The heuristic function is admissible and consistent, meaning it never overestimates the cost to reach the goal state and the estimated cost of reaching a goal state is non-decreasing along a path. The initialize function initializes the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem. The a_star function then uses these initialized variables to find the shortest path to the goal state.
+llm code run result: None
+
+
+
+ID: 4
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'L'. Our task is to visit city D and city N excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from N and D, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  D E Z R N I K G L B \nD 0 1 1 1 0 0 0 1 1 1 \nE 0 0 1 0 0 1 0 0 0 0 \nZ 0 0 0 0 1 0 0 0 0 0 \nR 1 0 1 0 0 0 0 0 0 1 \nN 0 1 0 0 0 1 1 1 0 0 \nI 1 0 0 0 1 0 1 0 1 0 \nK 0 0 1 0 1 0 0 0 0 0 \nG 0 0 1 1 0 1 0 0 0 0 \nL 0 0 1 0 0 0 0 1 0 0 \nB 0 1 0 0 0 1 1 0 0 0 \n", 'is_feasible': [[[0, 1, 1, 1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 1, 1, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 1, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 1, 0, 0, 0]], ['D', 'E', 'Z', 'R', 'N', 'I', 'K', 'G', 'L', 'B'], 'D', 'N'], 'is_correct': [[[0, 1, 1, 1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 1, 1, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 1, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 1, 0, 0, 0]], ['D', 'E', 'Z', 'R', 'N', 'I', 'K', 'G', 'L', 'B'], 'L', 'D', 'N'], 'Astar': ['[[0, 1, 1, 1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 1, 1, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 1, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 1, 0, 0, 0]]', "['D', 'E', 'Z', 'R', 'N', 'I', 'K', 'G', 'L', 'B']", "['L']", "['D', 'N']"], 'opt': [['L', 'Z', 'N', 'K', 'N', 'I', 'D', 'R', 'D'], 9, 0.026905059814453125]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_4.py", line 85, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_4.py", line 63, in a_star
+    heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [new_state], new_state))
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_4.py", line 79, in heuristic
+    goal_row, goal_col = [(x, y) for x in range(len(goal)) for y in range(len(goal[x])) if goal[x][y] == state[i][j]][0]
+IndexError: list index out of range
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the puzzle, represented as 3x3 tuples
+   initial_state = 'L'
+   goal_state = ['D', 'D', 'N', 'N']   
+  
+   # Encoding other variables given in the problem statement
+   adjacency_matrix = {
+       'D': ['E', 'Z', 'R', 'G', 'L', 'B'],
+       'E': ['Z', 'I'],
+       'Z': ['N'],
+       'R': ['D', 'Z', 'B'],
+       'N': ['E', 'I', 'K', 'G'],
+       'I': ['D', 'N', 'K', 'L'],
+       'K': ['Z', 'N'],
+       'G': ['Z', 'R', 'I'],
+       'L': ['Z', 'G'],
+       'B': ['E', 'I', 'K']
+   }
+
+
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_state, adjacency_matrix, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial and goal board and dimensions of the puzzle board)
+   initial_state, goal_state, adjacency_matrix, visited_costs, queue = initialize()
+
+
+   # While there are un-visited states
+   while queue:
+       # Pop the state with the lowest sum of the cost so far and estimated cost to the goal from the queue
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if sorted(actions) == goal_state:
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes swapping any of the tiles neighboring the empty spot, with the empty spot
+       for next_state in adjacency_matrix[state]:
+           # The actions is valid, generate the new state
+           new_state = next_state
+           # The cost so far is the number of swaps made, as our objective is to minimize the number of swaps required to reach the goal state 
+           new_cost = g + 1
+          
+           # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+           if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+               visited_costs[new_state] = new_cost
+               heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [new_state], new_state))
+                  
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic is the sum of the Manhattan distances (the shortest path) of each tile from its goal position
+   # The heuristic relaxes the constraint that a tile can only be swapped with the empty spot and presumes we can move the tiles to their goal position by swapping them with any of the other tiles
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of moving a tile to a neighboring coordinate is always 1, which is exactly the decrease in the Manhattan distance, if the tile is moved toward its goal position, otherwise the estimated cost of the successor node is the same or higher, and he heuristic estimate for the goal state is 0, as the distance of each tile from its goal position would be 0 in the goal state.
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[i])):
+           # Can't compare integers with "_" when finding the goal position of each tile, thus ignore the "_" tile
+           if state[i][j] != '_':
+               # Get goal position of each tile
+               goal_row, goal_col = [(x, y) for x in range(len(goal)) for y in range(len(goal[x])) if goal[x][y] == state[i][j]][0]
+               # Add the the Manhattan distance of the current and goal coordinates of the tile to the estimate
+               h += abs(i - goal_row) + abs(j - goal_col)
+   return h
+
+
+print(a_star())
+```
+
+This problem is a bit more complex than the previous ones, as it involves a graph traversal with constraints on the number of times certain nodes (cities) must be visited. The A* search algorithm is implemented in a similar way, with the heuristic function being the sum of the Manhattan distances of each tile from its goal position. The initialize function encodes the initial state, goal state, and adjacency matrix of the graph, as well as initializing the visited_costs dictionary and the priority queue. The a_star function then performs the A* search, generating all valid actions from the current state and adding new states to the queue if they have not been visited or if a lower cost path to them has been found. The heuristic function is used to estimate the remaining cost to reach the goal state from each new state. The solution is a list of city names representing the quickest route to visit cities D and N exactly twice.
+llm code run result: None
+
+
+
+ID: 5
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'H'. Our task is to visit city Z and city K excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from K and Z, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  K B Z S X H O E U V \nK 0 0 1 1 0 0 1 1 0 1 \nB 0 0 0 0 0 0 0 1 0 1 \nZ 0 1 0 1 0 1 1 0 0 1 \nS 0 1 1 0 1 0 0 0 0 0 \nX 1 1 0 0 0 0 0 0 0 1 \nH 0 0 0 1 0 0 1 0 1 0 \nO 0 0 1 1 1 0 0 0 0 0 \nE 1 0 0 0 0 0 1 0 0 1 \nU 0 0 0 0 0 0 1 0 0 0 \nV 0 0 0 0 1 0 0 0 0 0 \n", 'is_feasible': [[[0, 0, 1, 1, 0, 0, 1, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 1], [0, 1, 0, 1, 0, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 1, 0, 0, 1, 0, 1, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 1, 0, 0, 1], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]], ['K', 'B', 'Z', 'S', 'X', 'H', 'O', 'E', 'U', 'V'], 'Z', 'K'], 'is_correct': [[[0, 0, 1, 1, 0, 0, 1, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 1], [0, 1, 0, 1, 0, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 1, 0, 0, 1, 0, 1, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 1, 0, 0, 1], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]], ['K', 'B', 'Z', 'S', 'X', 'H', 'O', 'E', 'U', 'V'], 'H', 'Z', 'K'], 'Astar': ['[[0, 0, 1, 1, 0, 0, 1, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 1], [0, 1, 0, 1, 0, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 1, 0, 0, 1, 0, 1, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 1, 0, 0, 1], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]', "['K', 'B', 'Z', 'S', 'X', 'H', 'O', 'E', 'U', 'V']", "['H']", "['Z', 'K']"], 'opt': [['H', 'O', 'X', 'K', 'E', 'K', 'Z', 'S', 'Z'], 9, 0.03679943084716797]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the puzzle, represented as 3x3 tuples
+   initial_state = 'H'
+   goal_state = ['K', 'K', 'Z', 'Z']   
+  
+   # Encoding other variables given in the problem statement
+   adjacency_matrix = [[0, 0, 1, 1, 0, 0, 1, 1, 0, 1],
+                       [0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+                       [0, 1, 0, 1, 0, 1, 1, 0, 0, 1],
+                       [0, 1, 1, 0, 1, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                       [0, 0, 0, 1, 0, 0, 1, 0, 1, 0],
+                       [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+                       [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+                       [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                       [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]
+   cities = ['K', 'B', 'Z', 'S', 'X', 'H', 'O', 'E', 'U', 'V']
+
+
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[(initial_state, tuple(goal_state))] = 0
+
+
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+   queue = [(0, 0, [], (initial_state, tuple(goal_state)))]
+  
+   return initial_state, goal_state, adjacency_matrix, cities, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial and goal board and dimensions of the puzzle board)
+   initial_state, goal_state, adjacency_matrix, cities, visited_costs, queue = initialize()
+
+
+   # While there are un-visited states
+   while queue:
+       # Pop the state with the lowest sum of the cost so far and estimated cost to the goal from the queue
+       _, g, actions, state = heapq.heappop(queue)
+       current_city, remaining_cities = state
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if not remaining_cities:
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes moving to any of the cities connected to the current city
+       for i in range(len(cities)):
+           if adjacency_matrix[cities.index(current_city)][i] == 1:
+               next_city = cities[i]
+               # Check if the next city is a destination city and we have not visited it twice already
+               if next_city in remaining_cities:
+                   new_remaining_cities = list(remaining_cities)
+                   new_remaining_cities.remove(next_city)
+                   new_state = (next_city, tuple(new_remaining_cities))
+                   new_cost = g + 1
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [next_city], new_state))
+               # If the next city is not a destination city and we have not visited it before, we can move to it
+               elif next_city not in actions:
+                   new_state = (next_city, remaining_cities)
+                   new_cost = g + 1
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [next_city], new_state))
+   return None
+
+
+def heuristic(state, goal_state):
+   # An admissible and consistent heuristic is the number of remaining cities to visit
+   # The heuristic relaxes the constraint that we can only move to cities connected to the current city and presumes we can move to any of the remaining cities directly from the current city
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of moving to a city is always 1, which is exactly the decrease in the number of remaining cities to visit, if the city is a destination city, otherwise the estimated cost of the successor node is the same or higher, and he heuristic estimate for the goal state is 0, as there are no remaining cities to visit in the goal state.
+   return len(state[1])
+
+
+print(a_star())
+```
+llm code run result: ['O', 'X', 'K', 'E', 'K', 'Z', 'S', 'Z']
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+gpt_4
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.6
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+5

@@ -1,0 +1,264 @@
+model: gpt_4 
+
+
+ID: 1
+{'difficulty_approx': 15, 'statement': "In the 'taxed coin exchange' problem, you are required to choose a subset of coins from this list [14, 2, 5, 8, 65, 5, 16, 2, 5, 2, 12, 17, 16, 15, 20, 4, 19, 9, 10, 64, 2, 10, 14, 2, 17], such that the sum of the chosen coins adds up to 208. Each coin in the list is unique and can only be used once. Also coins carry a tax value. The tax values for each coin is {20: 13, 4: 2, 17: 16, 19: 8, 64: 4, 5: 3, 14: 10, 10: 9, 65: 11, 16: 2, 12: 7, 8: 5, 2: 2, 15: 14, 9: 8}, where the tax for coins of the same value is the same. Also, if the coin chosen is smaller than the previous one, it must have an even value, otherwise, if the coin is larger than or equal to the previous coin chosen, it must have an odd value. The objective is to determine which subset of coins should be selected to minimize the total tax paid. The solution should be presented as a list of numbers, representing the value of the coins chosen in order, with the first coins chosen being in index 0, formatted in Python syntax.", 'is_feasible': [[14, 2, 5, 8, 65, 5, 16, 2, 5, 2, 12, 17, 16, 15, 20, 4, 19, 9, 10, 64, 2, 10, 14, 2, 17]], 'is_correct': [[14, 2, 5, 8, 65, 5, 16, 2, 5, 2, 12, 17, 16, 15, 20, 4, 19, 9, 10, 64, 2, 10, 14, 2, 17], {'20': 13, '4': 2, '17': 16, '19': 8, '64': 4, '5': 3, '14': 10, '10': 9, '65': 11, '16': 2, '12': 7, '8': 5, '2': 2, '15': 14, '9': 8}, 208], 'Astar': ['[14, 2, 5, 8, 65, 5, 16, 2, 5, 2, 12, 17, 16, 15, 20, 4, 19, 9, 10, 64, 2, 10, 14, 2, 17]', '{20: 13, 4: 2, 17: 16, 19: 8, 64: 4, 5: 3, 14: 10, 10: 9, 65: 11, 16: 2, 12: 7, 8: 5, 2: 2, 15: 14, 9: 8}', '208'], 'opt': [[64, 16, 4, 5, 5, 19, 65, 16, 12, 2], 44, 0.03430962562561035]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./coin_exchange_results/gpt_4_2part_Astar_in_catagory_/gpt_4_2part_Astar_in_catagory__python_scripts/full_Astar_problem_1.py", line 62, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./coin_exchange_results/gpt_4_2part_Astar_in_catagory_/gpt_4_2part_Astar_in_catagory__python_scripts/full_Astar_problem_1.py", line 49, in a_star
+    heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [coin], new_state))
+  File "/home/nasimb/Astar/./coin_exchange_results/gpt_4_2part_Astar_in_catagory_/gpt_4_2part_Astar_in_catagory__python_scripts/full_Astar_problem_1.py", line 59, in heuristic
+    return (goal - state[0]) / max(coins)
+NameError: name 'coins' is not defined
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the problem
+   initial_state = (0, 0, 0, 0)
+   goal_state = 208
+   # Define the coins and their tax values
+   coins = [14, 2, 5, 8, 65, 5, 16, 2, 5, 2, 12, 17, 16, 15, 20, 4, 19, 9, 10, 64, 2, 10, 14, 2, 17]
+   tax = {20: 13, 4: 2, 17: 16, 19: 8, 64: 4, 5: 3, 14: 10, 10: 9, 65: 11, 16: 2, 12: 7, 8: 5, 2: 2, 15: 14, 9: 8}
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_state, coins, tax, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem
+   initial_state, goal_state, coins, tax, visited_costs, queue = initialize()
+
+
+   # While there are un-visited states
+   while queue:
+       # Pop the state with the lowest sum of the cost so far and estimated cost to the goal from the queue
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if state[0] == goal_state:
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes choosing any of the remaining coins
+       for coin in coins:
+           # Check if the coin is valid, ie if the coin is smaller than the previous one, it must have an even value, otherwise, if the coin is larger than or equal to the previous coin chosen, it must have an odd value
+           if (coin < state[1] and coin % 2 == 0) or (coin >= state[1] and coin % 2 == 1):
+               # The actions is valid, generate the new state
+               new_state = (state[0] + coin, coin, state[2] + tax[coin], state[3] + 1)
+               # The cost so far is the total tax paid, as our objective is to minimize the total tax paid to reach the goal state 
+               new_cost = g + tax[coin]
+              
+               # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [coin], new_state))
+                  
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic is the remaining amount to reach the goal state divided by the maximum coin value
+   # The heuristic relaxes the constraint that a coin can only be used once and presumes we can reach the goal state by using the maximum coin value
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of choosing a coin is the tax of the coin, which is always greater than or equal to 1, the decrease in the remaining amount to reach the goal state, if the coin is chosen toward the goal state, otherwise the estimated cost of the successor node is the same or higher, and he heuristic estimate for the goal state is 0, as the remaining amount to reach the goal state would be 0 in the goal state.
+   return (goal - state[0]) / max(coins)
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty_approx': 16, 'statement': "In the 'taxed coin exchange' problem, you are required to choose a subset of coins from this list [13, 10, 12, 10, 16, 7, 9, 14, 13, 18, 36, 11, 7, 14, 7, 8, 19, 7, 39, 13, 3, 18, 20, 4, 3, 18, 15, 2, 19, 16], such that the sum of the chosen coins adds up to 203. Each coin in the list is unique and can only be used once. Also coins carry a tax value. The tax values for each coin is {15: 5, 36: 15, 39: 9, 9: 8, 13: 3, 2: 2, 18: 10, 12: 12, 3: 3, 8: 8, 11: 6, 10: 4, 4: 4, 14: 10, 7: 3, 16: 16, 20: 18, 19: 17}, where the tax for coins of the same value is the same. Also, if the coin chosen is smaller than the previous one, it must have an even value, otherwise, if the coin is larger than or equal to the previous coin chosen, it must have an odd value. The objective is to determine which subset of coins should be selected to minimize the total tax paid. The solution should be presented as a list of numbers, representing the value of the coins chosen in order, with the first coins chosen being in index 0, formatted in Python syntax.", 'is_feasible': [[13, 10, 12, 10, 16, 7, 9, 14, 13, 18, 36, 11, 7, 14, 7, 8, 19, 7, 39, 13, 3, 18, 20, 4, 3, 18, 15, 2, 19, 16]], 'is_correct': [[13, 10, 12, 10, 16, 7, 9, 14, 13, 18, 36, 11, 7, 14, 7, 8, 19, 7, 39, 13, 3, 18, 20, 4, 3, 18, 15, 2, 19, 16], {'15': 5, '36': 15, '39': 9, '9': 8, '13': 3, '2': 2, '18': 10, '12': 12, '3': 3, '8': 8, '11': 6, '10': 4, '4': 4, '14': 10, '7': 3, '16': 16, '20': 18, '19': 17}, 203], 'Astar': ['[13, 10, 12, 10, 16, 7, 9, 14, 13, 18, 36, 11, 7, 14, 7, 8, 19, 7, 39, 13, 3, 18, 20, 4, 3, 18, 15, 2, 19, 16]', '{15: 5, 36: 15, 39: 9, 9: 8, 13: 3, 2: 2, 18: 10, 12: 12, 3: 3, 8: 8, 11: 6, 10: 4, 4: 4, 14: 10, 7: 3, 16: 16, 20: 18, 19: 17}', '203'], 'opt': [[7, 7, 7, 13, 13, 39, 36, 10, 15, 10, 11, 13, 2, 7, 4, 9], 78, 0.03766942024230957]}
+LLM  program executed successfully but no output produced by the LLM code.
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the problem, represented as tuples
+   initial_state = (0, 0, 0)
+   goal_state = 203
+   # Encoding other variables given in the problem statement
+   coins = [13, 10, 12, 10, 16, 7, 9, 14, 13, 18, 36, 11, 7, 14, 7, 8, 19, 7, 39, 13, 3, 18, 20, 4, 3, 18, 15, 2, 19, 16]
+   taxes = {15: 5, 36: 15, 39: 9, 9: 8, 13: 3, 2: 2, 18: 10, 12: 12, 3: 3, 8: 8, 11: 6, 10: 4, 4: 4, 14: 10, 7: 3, 16: 16, 20: 18, 19: 17}
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_state, coins, taxes, visited_costs, queue
+  
+  
+def a_star():
+   # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial and goal state, coins, and taxes)
+   initial_state, goal_state, coins, taxes, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # We can check if the current state is the goal state with a simple equality check, as the goal state is predefined
+       if state[0] == goal_state:
+           return actions
+
+
+       # Generate all valid actions from the current state, which includes choosing any of the remaining coins
+       for coin in coins:
+           # Check if the coin is valid, ie if the coin is smaller than the previous one, it must have an even value, otherwise, if the coin is larger than or equal to the previous coin chosen, it must have an odd value
+           if (coin < state[1] and coin % 2 == 0) or (coin >= state[1] and coin % 2 == 1):
+               # The action is valid, generate the new state
+               new_state = (state[0] + coin, coin, state[2] + taxes[coin])
+               # The cost so far is the total tax paid, as our objective is to minimize the total tax paid
+               new_cost = g + taxes[coin]
+              
+               # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   heapq.heappush(queue, (new_cost + heuristic(new_state, goal_state), new_cost, actions + [coin], new_state))
+                  
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic is the difference between the goal sum and the current sum of the coins
+   # The heuristic relaxes the constraints that the coins must be unique, that the coins carry a tax value, and that the coins must be smaller or larger than the previous one based on their parity; ie It presumes we can choose any coin to reach the goal sum
+   # Thus the heuristic reports a lower estimate on the cost to reach goal state and is admissible
+   # The heuristic is consistent because the cost of choosing a coin is the tax of the coin, which is always greater than or equal to 1, the decrease in the difference between the goal sum and the current sum, if the coin is chosen toward the goal sum, otherwise the estimated cost of the successor node is the same or higher, and the heuristic estimate for the goal state is 0, as the difference between the goal sum and the current sum would be 0 in the goal state.
+   return goal - state[0]
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 3
+{'difficulty_approx': 17, 'statement': "In the 'taxed coin exchange' problem, you are required to choose a subset of coins from this list [13, 19, 9, 4, 18, 17, 2, 14, 17, 17, 8, 6, 4, 10, 19, 37, 20, 19, 14, 7, 6, 11, 21, 9, 3, 10, 21, 20, 2, 17, 2], such that the sum of the chosen coins adds up to 215. Each coin in the list is unique and can only be used once. Also coins carry a tax value. The tax values for each coin is {14: 2, 18: 9, 11: 10, 9: 6, 10: 9, 13: 10, 37: 9, 6: 5, 2: 2, 4: 1, 8: 3, 19: 10, 17: 7, 7: 6, 3: 3, 21: 3, 20: 4}, where the tax for coins of the same value is the same. Also, if the coin chosen is smaller than the previous one, it must have an even value, otherwise, if the coin is larger than or equal to the previous coin chosen, it must have an odd value. The objective is to determine which subset of coins should be selected to minimize the total tax paid. The solution should be presented as a list of numbers, representing the value of the coins chosen in order, with the first coins chosen being in index 0, formatted in Python syntax.", 'is_feasible': [[13, 19, 9, 4, 18, 17, 2, 14, 17, 17, 8, 6, 4, 10, 19, 37, 20, 19, 14, 7, 6, 11, 21, 9, 3, 10, 21, 20, 2, 17, 2]], 'is_correct': [[13, 19, 9, 4, 18, 17, 2, 14, 17, 17, 8, 6, 4, 10, 19, 37, 20, 19, 14, 7, 6, 11, 21, 9, 3, 10, 21, 20, 2, 17, 2], {'14': 2, '18': 9, '11': 10, '9': 6, '10': 9, '13': 10, '37': 9, '6': 5, '2': 2, '4': 1, '8': 3, '19': 10, '17': 7, '7': 6, '3': 3, '21': 3, '20': 4}, 215], 'Astar': ['[13, 19, 9, 4, 18, 17, 2, 14, 17, 17, 8, 6, 4, 10, 19, 37, 20, 19, 14, 7, 6, 11, 21, 9, 3, 10, 21, 20, 2, 17, 2]', '{14: 2, 18: 9, 11: 10, 9: 6, 10: 9, 13: 10, 37: 9, 6: 5, 2: 2, 4: 1, 8: 3, 19: 10, 17: 7, 7: 6, 3: 3, 21: 3, 20: 4}', '215'], 'opt': [[14, 21, 20, 4, 37, 4, 21, 20, 18, 8, 17, 14, 17], 55, 0.0338587760925293]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state and the goal state of the problem
+   initial_state = (0, 0, 0, 0)
+   goal_sum = 215
+   coins = [13, 19, 9, 4, 18, 17, 2, 14, 17, 17, 8, 6, 4, 10, 19, 37, 20, 19, 14, 7, 6, 11, 21, 9, 3, 10, 21, 20, 2, 17, 2]
+   taxes = {14: 2, 18: 9, 11: 10, 9: 6, 10: 9, 13: 10, 37: 9, 6: 5, 2: 2, 4: 1, 8: 3, 19: 10, 17: 7, 7: 6, 3: 3, 21: 3, 20: 4}
+   num_coins = len(coins)
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, goal_sum, coins, taxes, num_coins, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, goal_sum, coins, taxes, num_coins, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If the sum of the coins in the current state equals the goal sum, return the actions taken
+       if state[1] == goal_sum:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes choosing any of the remaining coins
+       for i in range(state[0], num_coins):
+           # Check if adding the coin to the current sum results in a valid state, ie the sum must not exceed the goal sum
+           if state[1] + coins[i] <= goal_sum:
+               # The coin must be smaller than the previous coin and have an even value, or be larger than or equal to the previous coin and have an odd value
+               if (coins[i] < state[2] and coins[i] % 2 == 0) or (coins[i] >= state[2] and coins[i] % 2 == 1):
+                   # Generate the new state
+                   new_state = (i + 1, state[1] + coins[i], coins[i], state[3] + taxes[coins[i]])
+                   # The cost so far is the sum of the taxes of the coins chosen, as our objective is to minimize the total tax paid
+                   new_cost = g + taxes[coins[i]]
+
+
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # The heuristic is the sum of the taxes of the remaining coins, as we are trying to minimize the total tax paid
+                       h = heuristic(new_state, goal_sum, coins, taxes)
+                       heapq.heappush(queue, (new_cost + h, new_cost, actions + [coins[i]], new_state))
+   return None
+
+
+
+
+def heuristic(state, goal_sum, coins, taxes):
+   # The heuristic function can be a simulation of choosing the remaining coins greedily, choosing the coin with the smallest tax repeatedly as long as the sum of the coins does not exceed the goal sum
+   # This heuristic is admissible because it is greedy, always opting for the action that minimizes the total tax paid, ensuring it never overestimates the cost to reach the goal
+   # The heuristic is consistent as the estimated cost of the next node is higher if a coin is removed from the state, or equal or less by at most the tax of the coin (equal to the cost of reaching the successor node, ie the tax of the coin) as the coin with the smallest tax is chosen to be added to the state in the heuristic. Thus h(n) can never be greater than c(n, n’)(equal to the tax of the coin) + h(n’)
+   h = 0
+   # Sort the remaining coins by increasing tax
+   remaining_coins = sorted(coins[state[0]:], key=lambda x: taxes[x])
+   # Iterate through the remaining coins
+   for coin in remaining_coins:
+       # Add the coin to the state as long as the sum of the coins does not exceed the goal sum
+       if state[1] + coin <= goal_sum:
+           # Increment the estimated cost to the goal by the tax of the coin
+           h += taxes[coin]
+   return h
+
+
+print(a_star())
+```
+llm code run result: [17, 19, 37, 20, 14, 6, 11, 21, 10, 21, 20, 2, 17]
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+gpt_4
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.4
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+30
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+3

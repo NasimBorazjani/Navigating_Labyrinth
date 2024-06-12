@@ -1,0 +1,43 @@
+{
+    "gpt_3.5_0shot_full_code": {
+        "Exceeded time limit. Killed": 39,
+        "Returned None": 18,
+        "RecursionError": 25,
+        "IndexError": 13,
+        "SyntaxError": 2,
+        "ValueError": 1,
+        "Not feasible": 1
+    },
+    "gpt_3.5_2part_Astar": {
+        "NameError": 17,
+        "IndexError": 7,
+        "Returned None": 4
+    },
+    "gpt_3.5_2part_instances": {
+        "Returned None": 44
+    },
+    "gpt_3.5_Astar_code_reasoning_full_code": {
+        "TypeError": 5,
+        "NameError": 52,
+        "IndexError": 35,
+        "Returned None": 1,
+        "Exceeded time limit. Killed": 3
+    },
+    "gpt_4_0shot_full_code": {
+        "Exceeded time limit. Killed": 9,
+        "Returned None": 53,
+        "AttributeError": 10,
+        "Not feasible": 6,
+        "TypeError": 5
+    },
+    "gpt_4_2part_instances": {
+        "ValueError": 2,
+        "Returned None": 2,
+        "Exceeded time limit. Killed": 5
+    },
+    "gpt_4_Astar_code_reasoning_full_code": {
+        "IndexError": 49,
+        "Returned None": 1,
+        "Exceeded time limit. Killed": 9
+    }
+}

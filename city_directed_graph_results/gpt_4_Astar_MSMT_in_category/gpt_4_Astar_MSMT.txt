@@ -1,0 +1,184 @@
+model: gpt_4 
+
+
+ID: 1
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'W'. Our task is to visit city A and city H excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from H and A, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  G D X N Y W A P V H \nG 0 0 0 0 0 0 0 0 0 1 \nD 0 0 0 0 0 0 0 1 0 0 \nX 1 0 0 0 1 1 0 0 0 0 \nN 0 0 0 0 0 1 1 0 0 1 \nY 0 0 1 1 0 0 1 0 0 0 \nW 0 0 1 0 0 0 0 0 0 0 \nA 1 1 1 0 0 0 0 0 1 0 \nP 1 0 0 0 1 0 0 0 0 1 \nV 1 0 0 0 0 0 0 1 0 0 \nH 1 1 0 1 0 0 1 1 0 0 \n", 'is_feasible': [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]], ['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H'], 'A', 'H'], 'is_correct': [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]], ['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H'], 'W', 'A', 'H'], 'Astar': ['[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]]', "['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H']", "['W']", "['A', 'H']"], 'opt': [['W', 'X', 'G', 'H', 'A', 'D', 'P', 'H', 'A'], 9, 0.020942211151123047]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_2part_Astar2/gpt_4_2part_Astar2_python_scripts/full_Astar_problem_1.py", line 69, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./city_directed_graph_results/gpt_4_2part_Astar2/gpt_4_2part_Astar2_python_scripts/full_Astar_problem_1.py", line 45, in a_star
+    if city_graph[0][i] not in visited_cities and city_graph[city_graph[0].index(current_city)][i] == 1:
+IndexError: list index out of range
+
+```python
+import heapq
+
+def initialize():
+    # Define the adjacency matrix of the city graph
+    city_graph = [['G', 'D', 'X', 'N', 'Y', 'W', 'A', 'P', 'V', 'H'],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                  [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                  [1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+                  [0, 0, 1, 1, 0, 0, 1, 0, 0, 0],
+                  [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                  [1, 1, 1, 0, 0, 0, 0, 0, 1, 0],
+                  [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                  [1, 1, 0, 1, 0, 0, 1, 1, 0, 0]]
+
+    # Define the initial state of the problem
+    # The initial state includes the current city, the cities that need to be visited twice, and the cities visited so far
+    initial_state = ('W', ('A', 'A', 'H', 'H'), ('W',))
+
+    # Initialize a dictionary to store the cost of reaching each visited state
+    visited_costs = {}
+    visited_costs[initial_state] = 0
+
+    # Initialize a priority queue of states not yet visited, with the initial state as the first element
+    queue = [(0, 0, ['W'], initial_state)]
+
+    return city_graph, visited_costs, queue
+
+def a_star():
+    city_graph, visited_costs, queue = initialize()
+
+    while queue:
+        _, g, path, state = heapq.heappop(queue)
+
+        current_city, cities_to_visit, visited_cities = state
+
+        # If there are no more cities to visit, return the path
+        if not cities_to_visit:
+            return path
+
+        # Generate all possible actions from the current state, which includes moving to any of the connected cities
+        for i in range(1, len(city_graph)):
+            if city_graph[0][i] not in visited_cities and city_graph[city_graph[0].index(current_city)][i] == 1:
+                new_city = city_graph[0][i]
+                new_visited_cities = visited_cities + (new_city,)
+                if new_city in cities_to_visit:
+                    new_cities_to_visit = list(cities_to_visit)
+                    new_cities_to_visit.remove(new_city)
+                    new_cities_to_visit = tuple(new_cities_to_visit)
+                else:
+                    new_cities_to_visit = cities_to_visit
+                new_state = (new_city, new_cities_to_visit, new_visited_cities)
+                new_cost = g + 1
+
+                if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                    visited_costs[new_state] = new_cost
+                    heapq.heappush(queue, (new_cost + heuristic(new_state), new_cost, path + [new_city], new_state))
+
+    return None
+
+def heuristic(state):
+    # An admissible and consistent heuristic for this problem is the number of cities that still need to be visited
+    # This heuristic is admissible because it never overestimates the cost to reach the goal, as each city that needs to be visited requires at least one move
+    # It's consistent because moving to a new city reduces the heuristic cost of the successor node by a max of 1, which is equal to the cost of reaching the successor node
+    return len(state[1])
+
+print(a_star())
+```
+
+In this problem, we are using the A* search algorithm to find the quickest route to visit two cities twice. The initialize function sets up the initial state of the problem, which includes the current city, the cities that need to be visited twice, and the cities visited so far. The a_star function then uses a priority queue to explore the city graph, always choosing the state with the lowest sum of the cost so far and the estimated cost to reach the goal. The heuristic function estimates the remaining cost to reach the goal by counting the number of cities that still need to be visited.
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty': 10, 'statement': "We have a map of cities, each represented by a letter, and they are connected by one-way roads. The adjacency matrix below shows the connections between the cities. Each row and column represents a city, and a '1' signifies a direct road from the city of the row to the city of the column. The travel time between any two directly connected cities is the same. Currently, we are located in city 'D'. Our task is to visit city K and city Q excatly twice. Determine the quickest route that allows us to visit both these destination cities, ensuring that we stop at the two destinations twice on our path. The sequence in which we visit the destination cities is not important. However, apart from Q and K, we can only visit each city once on our path. Provide the solution as a list of the city names on our path, including the start, in Python syntax.\n\n  S U X D I Z R M K Q \nS 0 0 0 0 1 0 0 0 0 1 \nU 0 0 1 0 0 0 0 0 0 0 \nX 0 0 0 0 0 0 1 0 1 0 \nD 0 1 0 0 0 1 0 0 0 0 \nI 0 1 0 0 0 0 0 0 0 1 \nZ 0 0 0 0 1 0 0 0 1 0 \nR 1 1 0 0 0 0 0 0 0 0 \nM 0 0 1 0 1 0 0 0 0 0 \nK 0 0 0 0 0 0 1 1 0 0 \nQ 0 1 0 1 1 1 0 0 1 0 \n", 'is_feasible': [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]], ['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q'], 'K', 'Q'], 'is_correct': [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]], ['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q'], 'D', 'K', 'Q'], 'Astar': ['[[0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]]', "['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q']", "['D']", "['K', 'Q']"], 'opt': [['D', 'Z', 'I', 'Q', 'K', 'R', 'S', 'Q', 'K'], 9, 0.027526378631591797]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+
+def initialize():
+    # Define the adjacency matrix of the city graph
+    city_graph = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                  [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+                  [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                  [0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                  [0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+                  [1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+                  [0, 1, 0, 1, 1, 1, 0, 0, 1, 0]]
+    # Define the city names
+    city_names = ['S', 'U', 'X', 'D', 'I', 'Z', 'R', 'M', 'K', 'Q']
+    # Define the initial state, which includes the current city, the cities to visit, and the cities visited so far
+    initial_state = ('D', ('K', 'K', 'Q', 'Q'), ('D',))
+    # Initialize a dictionary to store the cost of reaching each visited state
+    visited_costs = {}
+    visited_costs[initial_state] = 0
+    # Initialize a priority queue of states not yet visited, with the initial state as the first element
+    queue = [(0, 0, ['D'], initial_state)]
+    return city_graph, city_names, initial_state, visited_costs, queue
+
+def a_star():
+    city_graph, city_names, initial_state, visited_costs, queue = initialize()
+    while queue:
+        _, g, path, state = heapq.heappop(queue)
+        current_city, cities_to_visit, cities_visited = state
+        # If there are no more cities to visit, return the path
+        if not cities_to_visit:
+            return path
+        # Generate all possible actions from the current state, which includes moving to any of the cities connected to the current city
+        for i in range(len(city_graph)):
+            if city_graph[city_names.index(current_city)][i] == 1:
+                next_city = city_names[i]
+                # Check if the next city is one of the cities to visit or has not been visited yet
+                if next_city in cities_to_visit or next_city not in cities_visited:
+                    # Generate the new state
+                    new_cities_to_visit = list(cities_to_visit)
+                    if next_city in new_cities_to_visit:
+                        new_cities_to_visit.remove(next_city)
+                    new_cities_visited = list(cities_visited) + [next_city]
+                    new_state = (next_city, tuple(new_cities_to_visit), tuple(new_cities_visited))
+                    # The cost so far is the number of cities visited, as the travel time between any two directly connected cities is the same
+                    new_cost = g + 1
+                    # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+                    if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                        visited_costs[new_state] = new_cost
+                        heapq.heappush(queue, (new_cost, new_cost, path + [next_city], new_state))
+    return None
+
+print(a_star())
+```
+
+In this problem, we are using the A* search algorithm to find the quickest route to visit two cities exactly twice. The algorithm starts from the initial state and explores all possible states by moving to any of the cities connected to the current city. The priority queue ensures that the states with the lowest cost are explored first. The cost of a state is the number of cities visited so far, as the travel time between any two directly connected cities is the same. The algorithm stops when there are no more cities to visit and returns the path of cities visited.
+llm code run result: ['D', 'Z', 'I', 'Q', 'K', 'R', 'S', 'Q', 'K']
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+gpt_4
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.4
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+20
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+2

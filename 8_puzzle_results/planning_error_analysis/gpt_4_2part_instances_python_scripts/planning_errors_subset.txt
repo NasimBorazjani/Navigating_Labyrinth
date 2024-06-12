@@ -1,0 +1,318 @@
+7
+{'difficulty': 3, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[36, 16, 48], [86, '_', 13], [89, 31, 37]]", 'is_feasible': [[[36, 16, 48], [86, '_', 13], [89, 31, 37]]], 'is_correct': [[[36, 16, 48], [86, '_', 13], [89, 31, 37]]], 'Astar': ["[[36, 16, 48], [86, '_', 13], [89, 31, 37]]"], 'opt': [[31, 37, 13, 31, 16, 36, 86, 89, 37, 16, 36, 86, 89, 37, 16, 13], 16, 0.03079676628112793]}
+LLM solution is feasible!! LLM solution is NOT correct 
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('36', '16', '48'), ('86', '_', '13'), ('89', '31', '37'))
+   num_rows = 3
+   num_cols = 3
+   # Define the goal state of the puzzle
+   goal_state = (('89', '86', '48'), ('36', '31', '16'), ('13', '37', '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: [13, 37, 31, 13, 16, 36, 86, 89, 13, 31, 37, 16, 36, 86, 89, 36, 31, 37]
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:1 
+
+
+47
+{'difficulty': 5, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[69, 92, 89, 72], [82, 13, 65, 59], [45, '_', 67, 8]]", 'is_feasible': [[[69, 92, 89, 72], [82, 13, 65, 59], [45, '_', 67, 8]]], 'is_correct': [[[69, 92, 89, 72], [82, 13, 65, 59], [45, '_', 67, 8]]], 'Astar': ["[[69, 92, 89, 72], [82, 13, 65, 59], [45, '_', 67, 8]]"], 'opt': [[13, 82, 45, 13, 67, 65, 82, 67, 13, 45, 69, 92, 89, 82, 65, 8], 16, 0.043500661849975586]}
+LLM solution is feasible!! LLM solution is NOT correct 
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = ((69, 92, 89, 72), (82, 13, 65, 59), (45, '_', 67, 8))
+   num_rows = 3
+   num_cols = 4
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = ((92, 89, 72, 69), (82, 67, 65, 59), (45, 13, 8, '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: [45, 82, 69, 92, 89, 65, 13, 69, 82, 45, 67, 13, 69, 67, 13, 8, 59, 69, 65, 72, 69, 59]
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:1 
+
+
+62
+{'difficulty': 4, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[87, 49, 79, 68, '_'], [56, 19, 64, 37, 7], [27, 15, 41, 35, 78]]", 'is_feasible': [[[87, 49, 79, 68, '_'], [56, 19, 64, 37, 7], [27, 15, 41, 35, 78]]], 'is_correct': [[[87, 49, 79, 68, '_'], [56, 19, 64, 37, 7], [27, 15, 41, 35, 78]]], 'Astar': ["[[87, 49, 79, 68, '_'], [56, 19, 64, 37, 7], [27, 15, 41, 35, 78]]"], 'opt': [[68, 37, 7, 78, 35, 7, 78, 68, 37, 78, 64, 41, 15, 19, 49, 79, 78, 37, 68, 64, 37, 68, 64, 35], 24, 0.16290855407714844]}
+LLM  program was killed because it exceeded the time limit.
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('87', '49', '79', '68', '_'), 
+                    ('56', '19', '64', '37', '7'), 
+                    ('27', '15', '41', '35', '78'))
+   num_rows = 3
+   num_cols = 5
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = (('87', '79', '68', '64', '56'), 
+                 ('49', '41', '37', '35', '27'), 
+                 ('19', '15', '7', '_', '78'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:1 
+
+
+63
+{'difficulty': 4, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[98, 80, 41, 91, 88], [75, 93, 24, '_', 12], [38, 37, 49, 65, 43]]", 'is_feasible': [[[98, 80, 41, 91, 88], [75, 93, 24, '_', 12], [38, 37, 49, 65, 43]]], 'is_correct': [[[98, 80, 41, 91, 88], [75, 93, 24, '_', 12], [38, 37, 49, 65, 43]]], 'Astar': ["[[98, 80, 41, 91, 88], [75, 93, 24, '_', 12], [38, 37, 49, 65, 43]]"], 'opt': [[65, 49, 24, 65, 91, 41, 80, 93, 65, 91, 49, 43, 12, 88, 41, 80, 91, 49, 88, 41, 80, 88, 43, 12], 24, 0.1251230239868164]}
+LLM solution is feasible!! LLM solution is NOT correct 
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('98', '80', '41', '91', '88'), ('75', '93', '24', '_', '12'), ('38', '37', '49', '65', '43'))
+   num_rows = 3
+   num_cols = 5
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = (('98', '91', '88', '80', '75'), ('93', '65', '49', '43', '41'), ('38', '37', '24', '12', '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: [91, 41, 80, 93, 75, 38, 37, 49, 24, 75, 49, 24, 65, 43, 12, 88, 41, 91, 75, 80, 91, 75, 88, 41, 75, 88, 80, 49, 93, 91, 49, 65, 24, 37, 38, 93, 65, 49, 88, 80, 43, 12]
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:1 
+
+
+64
+{'difficulty': 4, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[54, 100, 91, 80, 56], [19, '_', 38, 74, 29], [14, 36, 44, 13, 10]]", 'is_feasible': [[[54, 100, 91, 80, 56], [19, '_', 38, 74, 29], [14, 36, 44, 13, 10]]], 'is_correct': [[[54, 100, 91, 80, 56], [19, '_', 38, 74, 29], [14, 36, 44, 13, 10]]], 'Astar': ["[[54, 100, 91, 80, 56], [19, '_', 38, 74, 29], [14, 36, 44, 13, 10]]"], 'opt': [[36, 44, 38, 36, 44, 14, 19, 54, 100, 91, 80, 74, 36, 38, 13, 10], 16, 0.03679513931274414]}
+LLM  program was killed because it exceeded the time limit.
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('54', '100', '91', '80', '56'), ('19', '_', '38', '74', '29'), ('14', '36', '44', '13', '10'))
+   num_rows = 3
+   num_cols = 5
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = (('100', '91', '80', '56', '54'), ('74', '38', '29', '19', '_'), ('44', '36', '14', '13', '10'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:1 
+
+
+65
+{'difficulty': 4, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[94, 93, 84, 27, 6], [55, 18, 91, 82, 8], [19, 32, 37, 30, '_']]", 'is_feasible': [[[94, 93, 84, 27, 6], [55, 18, 91, 82, 8], [19, 32, 37, 30, '_']]], 'is_correct': [[[94, 93, 84, 27, 6], [55, 18, 91, 82, 8], [19, 32, 37, 30, '_']]], 'Astar': ["[[94, 93, 84, 27, 6], [55, 18, 91, 82, 8], [19, 32, 37, 30, '_']]"], 'opt': [[8, 6, 27, 82, 30, 8, 6, 27, 82, 84, 91, 37, 32, 18, 37, 32, 8, 6], 18, 0.03599905967712402]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_65.py", line 41, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_65.py", line 30, in a_star
+    heapq.heappush(queue, ((g + heuristic(new_state, goal_state)), new_cost, (actions + [int(new_state[empty_spot_coord[0]][empty_spot_coord[1]])]), new_state))
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_65.py", line 38, in heuristic
+    goal_coord = [(x, y) for (x, row) in enumerate(goal) for (y, element) in enumerate(row) if (element == state[i][j])][0]
+IndexError: list index out of range
+
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('94', '93', '84', '27', '6'), 
+                    ('55', '18', '91', '82', '8'), 
+                    ('19', '32', '37', '30', '_'))
+   num_rows = 3
+   num_cols = 5
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = (('94', '93', '84', '55', '32'), 
+                 ('27', '19', '18', '91', '37'), 
+                 ('6', '8', '30', '_', '_'))
+
+   # Initialize a dictionary to store the cost of reaching each visited state
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   # Initialize a priority queue of states not yet visited, with the initial state as the first element. 
+   # The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+   # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:0 
+
+
+85
+{'difficulty': 8, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]", 'is_feasible': [[[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]], 'is_correct': [[[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]], 'Astar': ["[[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]"], 'opt': [[26, 39, 51, 7, 43, 23, 91, 26, 27, 63, 26, 91, 23, 27, 91, 23, 27, 51, 39, 91, 51, 43, 89, 17, 68, 27, 43, 89, 17, 68, 27, 17, 7, 39, 89, 43, 17, 7, 39, 69, 68, 27], 42, 43.326194763183594]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_85.py", line 41, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_85.py", line 30, in a_star
+    heapq.heappush(queue, ((g + heuristic(new_state, goal_state)), new_cost, (actions + [int(new_state[empty_spot_coord[0]][empty_spot_coord[1]])]), new_state))
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_85.py", line 38, in heuristic
+    goal_coord = [(x, y) for (x, row) in enumerate(goal) for (y, element) in enumerate(row) if (element == state[i][j])][0]
+IndexError: list index out of range
+
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('93', '26', '39', '51', '69'),
+                    ('27', '_', '43', '7', '89'),
+                    ('63', '91', '23', '68', '17'))
+   num_rows = 3
+   num_cols = 5
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = (('93', '91', '89', '69', '68'),
+                 ('63', '51', '43', '39', '27'),
+                 ('26', '23', '17', '_', '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:0 
+
+
+86
+{'difficulty': 8, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[88, 71, 83, 72, 37], [98, 43, 53, '_', 82], [24, 20, 54, 14, 21]]", 'is_feasible': [[[88, 71, 83, 72, 37], [98, 43, 53, '_', 82], [24, 20, 54, 14, 21]]], 'is_correct': [[[88, 71, 83, 72, 37], [98, 43, 53, '_', 82], [24, 20, 54, 14, 21]]], 'Astar': ["[[88, 71, 83, 72, 37], [98, 43, 53, '_', 82], [24, 20, 54, 14, 21]]"], 'opt': [[82, 21, 14, 82, 21, 37, 72, 83, 53, 43, 20, 54, 43, 21, 82, 43, 21, 20, 71, 88, 98, 71, 54, 21, 20, 53, 83, 82, 43, 14], 30, 1.5921499729156494]}
+LLM  program was killed because it exceeded the time limit.
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = (('88', '71', '83', '72', '37'), ('98', '43', '53', '_', '82'), ('24', '20', '54', '14', '21'))
+   num_rows = 3
+   num_cols = 5
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = (('98', '88', '83', '82', '72'), ('71', '54', '53', '43', '37'), ('31', '24', '21', '20', '14', '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:0 
+
+
+99
+{'difficulty': 6, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[92, 75, 100, 61, 43, 87], [64, 34, 55, 90, 20, 86], [36, '_', 32, 5, 42, 83]]", 'is_feasible': [[[92, 75, 100, 61, 43, 87], [64, 34, 55, 90, 20, 86], [36, '_', 32, 5, 42, 83]]], 'is_correct': [[[92, 75, 100, 61, 43, 87], [64, 34, 55, 90, 20, 86], [36, '_', 32, 5, 42, 83]]], 'Astar': ["[[92, 75, 100, 61, 43, 87], [64, 34, 55, 90, 20, 86], [36, '_', 32, 5, 42, 83]]"], 'opt': [[34, 64, 92, 75, 100, 61, 90, 20, 43, 87, 86, 83, 42, 5, 20, 55, 64, 92, 75, 100, 92, 64, 61, 90, 87, 86, 83, 42], 28, 0.13985705375671387]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_99.py", line 41, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_99.py", line 30, in a_star
+    heapq.heappush(queue, ((g + heuristic(new_state, goal_state)), new_cost, (actions + [int(new_state[empty_spot_coord[0]][empty_spot_coord[1]])]), new_state))
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_2part/gpt_4_2part_instances_python_scripts/problem_99.py", line 38, in heuristic
+    goal_coord = [(x, y) for (x, row) in enumerate(goal) for (y, element) in enumerate(row) if (element == state[i][j])][0]
+IndexError: list index out of range
+
+```python
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = ((92, 75, 100, 61, 43, 87), (64, 34, 55, 90, 20, 86), (36, '_', 32, 5, 42, 83))
+   num_rows = 3
+   num_cols = 6
+   # Define the goal state of the puzzle as a 2d tuple
+   goal_state = ((100, 92, 87, 86, 83, 75), (61, 55, 43, 42, 36, 34), (32, 20, '_', '_', '_', '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Correct Variables Returned:1 Variables Align with Astar:0 
+
+
+Astar_passed_constraints
+
+{'difficulty': 2, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[12, 55, '_'], [35, 97, 43], [17, 25, 9]]", 'is_feasible': [[[12, 55, '_'], [35, 97, 43], [17, 25, 9]]], 'is_correct': [[[12, 55, '_'], [35, 97, 43], [17, 25, 9]]], 'Astar': ["[[12, 55, '_'], [35, 97, 43], [17, 25, 9]]"], 'opt': [[55, 97, 35, 12, 97, 55, 43, 9, 25, 17, 12, 35, 9, 25, 17, 9, 25, 17], 18, 0.04202771186828613]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+
+def initialize():
+   # Define the initial state of the puzzle as a 2d tuple
+   initial_state = ((12, 55, '_'), (35, 97, 43), (17, 25, 9))
+   num_rows = 3
+   num_cols = 3
+   goal_state = ((97, 55, 43), (35, 25, 17), (12, 9, '_'))
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_rows, num_cols, goal_state, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_rows, num_cols, goal_state, visited_costs, queue = initialize()
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+       # If the current state is the goal state, return the actions taken
+       if state == goal_state:
+           return actions
+
+       # Generate all possible actions from the current state, which includes swapping the empty spot with any of the 4 neighboring tiles
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new tile is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the new tile
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of swaps made, as the task is to minimize the number of swaps required
+               new_cost = g + 1
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The action taken is the number on the tile that was swapped with the empty spot
+                   heapq.heappush(queue, (g + heuristic(new_state, goal_state), new_cost, actions + [int(new_state[empty_spot_coord[0]][empty_spot_coord[1]])], new_state))
+   return None
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the sum of the Manhattan distances from each tile in its current position to its position in the goal state
+   # This heuristic relaxes the constraint that only the empty spot can be moved, and assumes that each tile can be moved to its goal position independently of the others
+   # Thus the heuristic reports a lower estimate on the cost of reaching the goal state and is admissible
+   # The heuristic is consistent because the estimated cost from the current state to the goal can never be greater than the sum of cost from the current node to a successor node plus the estimated cost from the successor node to the goal because the cost of moving the empty spot to an adjacent tile is 1, which is equal to the decrease in the Manhattan distance of the tile that was swapped with the empty spot
+   # Also the cost of the goal state is 0, as all tiles are in their goal positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != '_':
+               goal_coord = [(x, y) for x, row in enumerate(goal) for y, element in enumerate(row) if element == state[i][j]][0]
+               h += abs(i - goal_coord[0]) + abs(j - goal_coord[1])
+   return h
+Initial State:1  Goal State:1  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:3  Admissible and consistent:1
+
+
+Total out of 9:
+Initial State:9  Goal State:0  Recording Path:9  Correct Variables Returned:9 Variables Align with Astar:5 
+

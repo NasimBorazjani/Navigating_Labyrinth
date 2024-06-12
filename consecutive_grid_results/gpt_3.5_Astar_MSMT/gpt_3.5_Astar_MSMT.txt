@@ -1,0 +1,197 @@
+model: gpt_3.5 
+
+
+ID: 1
+{'difficulty': 7, 'statement': "We have a 3x3 numerical grid, with numbers ranging from 13 to 46 (13 included in the range but 46 is not included). The numbers in each row and column must be strictly increasing or decreasing. This means that either first > second > third or first < second < third in each row and column. If a grid cell is marked with an 'x', the number in that position is hidden. The objective is to replace the 'x's with unique integers from the given range, ensuring that each number only appears once in the grid. The replacements must maintain the consecutive order in each row and column. Additionally, the sum of the numbers in the topmost row plus the numbers in the rightmost column plus the numbers in the diagonal connecting the top-left corner of the grid to its bottom-right corner should be minimized. The solution should be given as a list of tuples in Python syntax. Each tuple should represent the replacement of a number with an  'x' number and contain three elements: the row index of the 'x', the column index  of the 'x' (both starting from 0), and the value of the number that replaces the 'x'. The initial state of the grid is as follows: \n\nGrid:\n [['16' 'x' '41']\n ['x' '30' 'x']\n ['x' '29' '30']]", 'is_feasible': ["[['16', '', '41'], ['', '30', ''], ['', '29', '30']]", 13, 46], 'is_correct': ["[['16', '', '41'], ['', '30', ''], ['', '29', '30']]", 13, 46], 'Astar': ["[['16', '', '41'], ['', '30', ''], ['', '29', '30']]", '13', '46'], 'opt': [[[0, 1, 31], [1, 0, 14], [1, 2, 32], [2, 0, 13]], 267, 0.23554539680480957]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./consecutive_grid_results/gpt_3.5_Astar_2part_/gpt_3.5_2part_Astar_python_scripts/full_Astar_problem_1.py", line 73, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./consecutive_grid_results/gpt_3.5_Astar_2part_/gpt_3.5_2part_Astar_python_scripts/full_Astar_problem_1.py", line 51, in a_star
+    heapq.heappush(queue, (new_cost + heuristic(new_state, new_numbers_range), new_cost, actions + [(row, col, num)], new_state, new_numbers_range))
+  File "/home/nasimb/Astar/./consecutive_grid_results/gpt_3.5_Astar_2part_/gpt_3.5_2part_Astar_python_scripts/full_Astar_problem_1.py", line 65, in heuristic
+    h += sum(state[0])
+TypeError: unsupported operand type(s) for +: 'int' and 'numpy.str_'
+
+```python
+import heapq
+import numpy as np
+
+
+def initialize():
+    # Define the initial state of the grid as a numpy array
+    grid = np.array([[16, 'x', 41], ['x', 30, 'x'], ['x', 29, 30]])
+    # Define the range of numbers that can replace 'x' in the grid
+    numbers_range = set(range(13, 46))
+
+    # Encoding other variables given in the problem statement
+    num_rows = 3
+    num_cols = 3
+
+    visited_costs = {}
+    visited_costs[tuple(map(tuple, grid))] = 0
+
+    # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+    # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+    queue = [(0, 0, [], grid, numbers_range)]
+
+    return grid, num_rows, num_cols, visited_costs, queue
+
+
+def a_star():
+    # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem
+    grid, num_rows, num_cols, visited_costs, queue = initialize()
+
+    while queue:
+        _, g, actions, state, numbers_range = heapq.heappop(queue)
+
+        # Unpack the state from the numpy array
+        state = np.array(state)
+
+        # If the state has at least 1 remaining unknown number, ie 'x'
+        if 'x' in state:
+            # Generate all possible actions from the current state, which includes replacing the next x in the grid with any of available unique integers
+            for row in range(num_rows):
+                for col in range(num_cols):
+                    if state[row][col] == 'x':
+                        for num in numbers_range:
+                            new_state = state.copy()
+                            new_state[row][col] = num
+                            new_numbers_range = numbers_range.copy()
+                            new_numbers_range.remove(num)
+                            new_cost = g + num
+
+                            if tuple(map(tuple, new_state)) not in visited_costs or new_cost < visited_costs[tuple(map(tuple, new_state))]:
+                                visited_costs[tuple(map(tuple, new_state))] = new_cost
+                                heapq.heappush(queue, (new_cost + heuristic(new_state, new_numbers_range), new_cost, actions + [(row, col, num)], new_state, new_numbers_range))
+        else:
+            return actions
+
+    return None
+
+
+def heuristic(state, numbers_range):
+    # An admissible and consistent heuristic is the sum of the numbers in the topmost row, rightmost column, and diagonal connecting the top-left corner to the bottom-right corner
+    # The heuristic relaxes the constraint that the numbers in each row and column must be strictly increasing or decreasing, as well as the constraint that each number must be unique
+    # It is admissible because it never overestimates the cost to reach the goal, as the sum of the numbers in the topmost row, rightmost column, and diagonal is minimized
+    # It is consistent because the estimated cost of the next node is higher if a number is replaced, or equal or less by at most 1 (equal to the cost of reaching the successor node) as the sum of the numbers in the topmost row, rightmost column, and diagonal is minimized
+    h = 0
+    # Calculate the sum of the topmost row
+    h += sum(state[0])
+    # Calculate the sum of the rightmost column
+    h += sum(state[:, -1])
+    # Calculate the sum of the diagonal connecting the top-left corner to the bottom-right corner
+    h += sum([state[i][i] for i in range(len(state))])
+    return h
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty': 7, 'statement': "We have a 3x3 numerical grid, with numbers ranging from 8 to 41 (8 included in the range but 41 is not included). The numbers in each row and column must be strictly increasing or decreasing. This means that either first > second > third or first < second < third in each row and column. If a grid cell is marked with an 'x', the number in that position is hidden. The objective is to replace the 'x's with unique integers from the given range, ensuring that each number only appears once in the grid. The replacements must maintain the consecutive order in each row and column. Additionally, the sum of the numbers in the topmost row plus the numbers in the rightmost column plus the numbers in the diagonal connecting the top-left corner of the grid to its bottom-right corner should be minimized. The solution should be given as a list of tuples in Python syntax. Each tuple should represent the replacement of a number with an  'x' number and contain three elements: the row index of the 'x', the column index  of the 'x' (both starting from 0), and the value of the number that replaces the 'x'. The initial state of the grid is as follows: \n\nGrid:\n [['10' '15' '39']\n ['x' '27' '29']\n ['x' 'x' 'x']]", 'is_feasible': ["[['10', '15', '39'], ['', '27', '29'], ['', '', '']]", 8, 41], 'is_correct': ["[['10', '15', '39'], ['', '27', '29'], ['', '', '']]", 8, 41], 'Astar': ["[['10', '15', '39'], ['', '27', '29'], ['', '', '']]", '8', '41'], 'opt': [[[1, 0, 11], [2, 0, 30], [2, 1, 28], [2, 2, 8]], 185, 0.6896023750305176]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+import numpy as np
+
+def initialize():
+    # Define the initial state of the grid as a numpy array
+    grid = np.array([[10, 15, 39], ['x', 27, 29], ['x', 'x', 'x']])
+    
+    # Define the range of numbers that can replace 'x' in the grid
+    numbers_range = set(range(8, 41))
+
+    # Encoding other variables given in the problem statement
+    num_rows = 3
+    num_cols = 3
+
+    visited_costs = {}
+    visited_costs[tuple(map(tuple, grid))] = 0
+
+    # Initialize a priority queue of states not yet visited, with the initial state as the first element. The priority of each element is the cost to reach that state (g) + the estimate remaining cost (h) to reach the goal
+    # Record the actions required to get to each state in a list; no actions performed to reach the initial state
+    queue = [(0, 0, [], grid, numbers_range)]
+
+    return grid, num_rows, num_cols, visited_costs, queue
+
+def a_star():
+    # The initialize function initializes and returns the visited_costs dictionary and the priority queue and encodes all of the variables given in the problem (ie the initial state of the grid, number of rows and columns, etc.)
+    grid, num_rows, num_cols, visited_costs, queue = initialize()
+
+    while queue:
+        _, g, actions, state, numbers_range = heapq.heappop(queue)
+
+        # Unpack the state to a numpy array
+        state = np.array(state)
+
+        # If there are no more unknown numbers in the grid, return the actions taken
+        if 'x' not in state:
+            return actions
+
+        # Generate all possible actions from the current state, which includes replacing the next 'x' in the grid with any of the available unique integers
+        for row in range(num_rows):
+            for col in range(num_cols):
+                if state[row][col] == 'x':
+                    for num in numbers_range:
+                        # Create a copy of the current state to modify
+                        new_state = state.copy()
+                        new_state[row][col] = num
+                        new_numbers_range = numbers_range.copy()
+                        new_numbers_range.remove(num)
+                        new_cost = g + num
+
+                        # If the new state is unvisited or we found a new path with a lower cost to reach this state, add it to the queue of not-yet-visited states
+                        if tuple(map(tuple, new_state)) not in visited_costs or new_cost < visited_costs[tuple(map(tuple, new_state))]:
+                            visited_costs[tuple(map(tuple, new_state))] = new_cost
+                            heapq.heappush(queue, (new_cost + heuristic(new_state, new_numbers_range), new_cost, actions + [(row, col, num)], new_state, new_numbers_range))
+
+    return None
+
+def heuristic(state, numbers_range):
+    # An admissible and consistent heuristic is the sum of the remaining numbers in the range that can be added to the grid
+    # This heuristic relaxes the constraint that the numbers in each row and column must be strictly increasing or decreasing
+    # It is admissible because it underestimates the cost to reach the goal, as it assumes all remaining numbers can be added to the grid without violating the constraints
+    # It is consistent because the cost of adding a number to the grid is always 1, which is the decrease in the heuristic estimate for the goal state
+    h = sum(numbers_range)
+    return h
+
+print(a_star())
+```
+llm code run result: [(1, 0, 8), (2, 0, 9), (2, 1, 10), (2, 2, 11)]
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+gpt_3.5
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.5
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+2

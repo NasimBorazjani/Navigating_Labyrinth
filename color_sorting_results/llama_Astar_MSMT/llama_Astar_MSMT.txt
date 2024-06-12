@@ -1,0 +1,548 @@
+model: llama 
+
+
+ID: 1
+{'difficulty': 9, 'statement': "The game of 'Sort It' begins with 3 tubes, each filled with 4 balls of different colors. The goal is to sort the balls by color, with each tube containing balls of only one color. Only one ball can be moved at a time, taken from the top of one tube and placed on top of another. The capacity of each tube (maximum number of balls we can fit in each tube) is 6 balls. It is not allowed to place a ball in a tube that already has 6 balls. The solution should be a list of tuples, each containing, first, the index of the tube from which a ball is taken and, second, the index of the tube to which it is moved, indexing from 0. Given the initial state of the tubes, represented by the lists below (with the leftmost item being the color of the topmost ball in each tube), what is the shortest list of move tuples that will result in all the balls being correctly sorted? [['Green', 'Red', 'Green', 'Red'], ['Blue', 'Blue', 'Red', 'Green'], ['Red', 'Blue', 'Green', 'Blue']]", 'is_feasible': [[['Green', 'Red', 'Green', 'Red'], ['Blue', 'Blue', 'Red', 'Green'], ['Red', 'Blue', 'Green', 'Blue']], 6], 'is_correct': [[['Green', 'Red', 'Green', 'Red'], ['Blue', 'Blue', 'Red', 'Green'], ['Red', 'Blue', 'Green', 'Blue']], 6], 'Astar': ["[['Green', 'Red', 'Green', 'Red'], ['Blue', 'Blue', 'Red', 'Green'], ['Red', 'Blue', 'Green', 'Blue']]", '6'], 'opt': [[[0, 1], [0, 2], [0, 1], [2, 0], [2, 0], [1, 0], [1, 0], [2, 1], [2, 0], [1, 2], [1, 2], [1, 2], [1, 2], [0, 1], [0, 1], [0, 1], [2, 0]], 17, 0.9051551818847656]}
+Program returned None
+
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the tubes as a 2d tuple
+   initial_state = (('Green', 'Red', 'Green', 'Red'),
+                   ('Blue', 'Blue', 'Red', 'Green'),
+                   ('Red', 'Blue', 'Green', 'Blue'))
+   num_tubes = 3
+   tube_capacity = 6
+   # Create the set of the valid colors that could be in the tubes
+   colors = set(['Green', 'Red', 'Blue'])
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_tubes, tube_capacity, colors, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_tubes, tube_capacity, colors, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # The goal state must not have any balls left in the tubes, thus we need to get (the coordinates of) the balls to check whether the current state is the goal state
+       ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(tuple(tube)) if ball != 'x']
+       if not ball_coords:
+           return actions
+
+
+       # If the state has at least 1 remaining ball, generate all possible actions from the current state, which includes moving the next ball in the tubes to another tube
+       else:
+           first_ball_coord = ball_coords[0]
+           # The ball must be unique and not be present in any other tubes
+           used_colors  = set(ball for tube in state for ball in tube if ball != 'x')
+           for color in colors:
+               # Check if the new state, containing the new ball, would be valid; ie the ball must be unique and the number of balls in each tube must not exceed the tube capacity
+               num_balls_in_tubes_new_state = [sum(1 for ball in tube if ball != 'x') for tube in state]
+               if (color not in used_colors and
+                   num_balls_in_tubes_new_state[first_ball_coord[0]] - 1 + num_balls_in_tubes_new_state[first_ball_coord[1]] + 1 <= tube_capacity):
+              
+                   # Generate the new state
+                   new_state = [list(tube[:]) for tube in state]
+                   new_state[first_ball_coord[0]].pop(first_ball_coord[1])
+                   new_state[first_ball_coord[1]].append(color)
+                   new_state = tuple(tuple(tube) for tube in new_state)
+                   # The additional cost of this state is 1 as we are trying to minimize the number of moves
+                   new_cost = g + 1
+                  
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # Relaxing the constraints on the columns sums and the diagonal sum to calculate the heuristic
+                       h = heuristic(new_state, colors)
+                       heapq.heappush(queue, (new_cost + h, new_cost, actions + [(first_ball_coord[0], first_ball_coord[1], color)], new_state))
+   return None
+
+
+
+
+def heuristic(state, colors):
+   # Relax the constraints on the columns sums and the diagonal sum to compute an admissible and consistent heuristic
+   # This heuristic considers the sum of differences between the goal and current state, for each color, considering the number of balls of that color in each tube
+   # The heuristic assumes xs can be filled with the smallest unique number satisfying row sum constraints, even if column or diagonal constraints are violated, thus reporting a lower cost estimate to reach the goal state, making it admissible
+   # The heuristic is consistent, ie non-decreasing along the path to the goal state, because the cost of moving a ball in the grid is 1, which is always greater than or equal to the number used to fill that position in the heuristic
+   # Also the cost of the goal state is 0, as the sum of the rows equals their goal sums and there are no unknown numbers to fill in the grid
+
+
+   h = 0
+   for color in colors:
+       num_balls_in_tubes = [sum(1 for ball in tube if ball == color) for tube in state]
+       h += abs(sum(num_balls_in_tubes) - len(color))
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty': 9, 'statement': "The game of 'Sort It' begins with 3 tubes, each filled with 4 balls of different colors. The goal is to sort the balls by color, with each tube containing balls of only one color. Only one ball can be moved at a time, taken from the top of one tube and placed on top of another. The capacity of each tube (maximum number of balls we can fit in each tube) is 6 balls. It is not allowed to place a ball in a tube that already has 6 balls. The solution should be a list of tuples, each containing, first, the index of the tube from which a ball is taken and, second, the index of the tube to which it is moved, indexing from 0. Given the initial state of the tubes, represented by the lists below (with the leftmost item being the color of the topmost ball in each tube), what is the shortest list of move tuples that will result in all the balls being correctly sorted? [['Red', 'Blue', 'Blue', 'Blue'], ['Green', 'Green', 'Red', 'Green'], ['Green', 'Blue', 'Red', 'Red']]", 'is_feasible': [[['Red', 'Blue', 'Blue', 'Blue'], ['Green', 'Green', 'Red', 'Green'], ['Green', 'Blue', 'Red', 'Red']], 6], 'is_correct': [[['Red', 'Blue', 'Blue', 'Blue'], ['Green', 'Green', 'Red', 'Green'], ['Green', 'Blue', 'Red', 'Red']], 6], 'Astar': ["[['Red', 'Blue', 'Blue', 'Blue'], ['Green', 'Green', 'Red', 'Green'], ['Green', 'Blue', 'Red', 'Red']]", '6'], 'opt': [[[1, 2], [1, 2], [1, 0], [2, 1], [2, 1], [2, 1], [2, 1], [0, 2], [0, 2], [1, 0]], 10, 0.05974388122558594]}
+Program returned None
+
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the tubes as a 2d tuple
+   initial_state = (('Red', 'Blue', 'Blue', 'Blue'),
+                   ('Green', 'Green', 'Red', 'Green'),
+                   ('Green', 'Blue', 'Red', 'Red'))
+   num_tubes = 3
+   # Create the set of the valid colors that could be in the tubes
+   colors = set(['Red', 'Blue', 'Green'])
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_tubes, colors, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_tubes, colors, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # The goal state must not have any balls left to sort, thus we need to get (the coordinates of) the balls to check whether the current state is the goal state
+       ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(reversed(tube)) if ball != 'x']
+       if not ball_coords:
+           return actions
+
+
+       # If the state has at least 1 remaining ball, generate all possible actions from the current state, which includes moving the next ball in the tubes to any other tube
+       else:
+           first_ball_coord = ball_coords[0]
+           # The ball must be unique and not be present in any other tubes
+           used_colors  = set(ball for tube in state for ball in tube if ball != 'x')
+           for color in colors:
+               # Check if the new state, containing the new ball, would be valid; ie the ball must be unique and the tube must not be full
+               if (color not in used_colors and
+                   len(state[first_ball_coord[0]]) < 6):
+              
+                   # Generate the new state
+                   new_state = [list(tube[:]) for tube in state]
+                   new_state[first_ball_coord[0]].pop(first_ball_coord[1])
+                   new_state[first_ball_coord[0]].append(color)
+                   new_state = tuple(tuple(reversed(tube)) for tube in new_state)
+                   # The additional cost of this state is 1 as we are trying to minimize the number of moves
+                   new_cost = g + 1
+                  
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # The heuristic is the number of balls left to sort
+                       h = heuristic(new_state)
+                       heapq.heappush(queue, (new_cost + h, new_cost, actions + [(first_ball_coord[0], color)], new_state))
+   return None
+
+
+
+
+def heuristic(state):
+   # The heuristic is the number of balls left to sort
+   return sum(len(tube) for tube in state)
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 3
+{'difficulty': 9, 'statement': "The game of 'Sort It' begins with 3 tubes, each filled with 4 balls of different colors. The goal is to sort the balls by color, with each tube containing balls of only one color. Only one ball can be moved at a time, taken from the top of one tube and placed on top of another. The capacity of each tube (maximum number of balls we can fit in each tube) is 6 balls. It is not allowed to place a ball in a tube that already has 6 balls. The solution should be a list of tuples, each containing, first, the index of the tube from which a ball is taken and, second, the index of the tube to which it is moved, indexing from 0. Given the initial state of the tubes, represented by the lists below (with the leftmost item being the color of the topmost ball in each tube), what is the shortest list of move tuples that will result in all the balls being correctly sorted? [['Red', 'Blue', 'Blue', 'Red'], ['Red', 'Blue', 'Blue', 'Green'], ['Green', 'Green', 'Red', 'Green']]", 'is_feasible': [[['Red', 'Blue', 'Blue', 'Red'], ['Red', 'Blue', 'Blue', 'Green'], ['Green', 'Green', 'Red', 'Green']], 6], 'is_correct': [[['Red', 'Blue', 'Blue', 'Red'], ['Red', 'Blue', 'Blue', 'Green'], ['Green', 'Green', 'Red', 'Green']], 6], 'Astar': ["[['Red', 'Blue', 'Blue', 'Red'], ['Red', 'Blue', 'Blue', 'Green'], ['Green', 'Green', 'Red', 'Green']]", '6'], 'opt': [[[0, 1], [2, 0], [2, 0], [2, 1], [0, 2], [0, 2], [0, 2], [0, 2], [1, 0], [1, 0], [1, 0], [1, 0], [1, 2], [1, 0], [2, 1], [2, 1], [2, 1], [0, 2], [0, 1]], 19, 2.109553337097168]}
+Program returned None
+
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the tubes as a 2d tuple
+   initial_state = (('Red', 'Blue', 'Blue', 'Red'),
+                   ('Red', 'Blue', 'Blue', 'Green'),
+                   ('Green', 'Green', 'Red', 'Green'))
+   num_tubes = 3
+   # Create the set of the valid colors that could be in the tubes
+   colors = set(['Red', 'Blue', 'Green'])
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_tubes, colors, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_tubes, colors, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # The goal state must not have any balls left to sort, thus we need to get (the coordinates of) the balls to check whether the current state is the goal state
+       ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(reversed(tube)) if ball != 'x']
+       if not ball_coords:
+           return actions
+
+
+       # If the state has at least 1 remaining ball, generate all possible actions from the current state, which includes moving the next ball from one tube to another
+       else:
+           first_ball_coord = ball_coords[0]
+           # The ball must be unique and not be present in any other tubes
+           used_colors  = set(ball for tube in state for ball in tube if ball != 'x')
+           for color in colors:
+               # Check if the new state, containing the new ball, would be valid; ie the ball must be unique and the tube must not be full
+               if (color not in used_colors and
+                   len(state[first_ball_coord[0]]) < 6):
+              
+                   # Generate the new state
+                   new_state = [list(tube[:]) for tube in state]
+                   new_state[first_ball_coord[0]].pop(first_ball_coord[1])
+                   new_state[first_ball_coord[0]].append(color)
+                   new_state = tuple(tuple(reversed(tube)) for tube in new_state)
+                   # The additional cost of this state is 1 as we are trying to minimize the number of moves
+                   new_cost = g + 1
+                  
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # The heuristic is the number of balls left to sort
+                       h = heuristic(new_state)
+                       heapq.heappush(queue, (new_cost + h, new_cost, actions + [(first_ball_coord[0], color)], new_state))
+   return None
+
+
+
+
+def heuristic(state):
+   # The heuristic is the number of balls left to sort
+   return sum(len(tube) for tube in state)
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 4
+{'difficulty': 9, 'statement': "The game of 'Sort It' begins with 3 tubes, each filled with 4 balls of different colors. The goal is to sort the balls by color, with each tube containing balls of only one color. Only one ball can be moved at a time, taken from the top of one tube and placed on top of another. The capacity of each tube (maximum number of balls we can fit in each tube) is 6 balls. It is not allowed to place a ball in a tube that already has 6 balls. The solution should be a list of tuples, each containing, first, the index of the tube from which a ball is taken and, second, the index of the tube to which it is moved, indexing from 0. Given the initial state of the tubes, represented by the lists below (with the leftmost item being the color of the topmost ball in each tube), what is the shortest list of move tuples that will result in all the balls being correctly sorted? [['Red', 'Red', 'Blue', 'Blue'], ['Red', 'Blue', 'Red', 'Green'], ['Green', 'Blue', 'Green', 'Green']]", 'is_feasible': [[['Red', 'Red', 'Blue', 'Blue'], ['Red', 'Blue', 'Red', 'Green'], ['Green', 'Blue', 'Green', 'Green']], 6], 'is_correct': [[['Red', 'Red', 'Blue', 'Blue'], ['Red', 'Blue', 'Red', 'Green'], ['Green', 'Blue', 'Green', 'Green']], 6], 'Astar': ["[['Red', 'Red', 'Blue', 'Blue'], ['Red', 'Blue', 'Red', 'Green'], ['Green', 'Blue', 'Green', 'Green']]", '6'], 'opt': [[[1, 0], [1, 2], [1, 0], [1, 2], [0, 1], [0, 1], [0, 1], [0, 1], [2, 1], [2, 0], [2, 1], [2, 0], [1, 2], [1, 2]], 14, 0.22463750839233398]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./color_sorting_results/llama_2part_Astar/llama_2part_Astar_python_scripts/full_Astar_problem_4.py", line 75, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./color_sorting_results/llama_2part_Astar/llama_2part_Astar_python_scripts/full_Astar_problem_4.py", line 33, in a_star
+    ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(Tube) if ball != 'x']
+  File "/home/nasimb/Astar/./color_sorting_results/llama_2part_Astar/llama_2part_Astar_python_scripts/full_Astar_problem_4.py", line 33, in <listcomp>
+    ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(Tube) if ball != 'x']
+NameError: name 'Tube' is not defined. Did you mean: 'tube'?
+
+
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the tubes as a 2d tuple
+   initial_state = (('Red', 'Red', 'Blue', 'Blue'),
+                   ('Red', 'Blue', 'Red', 'Green'),
+                   ('Green', 'Blue', 'Green', 'Green'))
+   num_tubes = 3
+   # Create the set of the valid colors that could be in the tubes
+   colors = set(['Red', 'Blue', 'Green'])
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_tubes, colors, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_tubes, colors, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # The goal state must not have any balls left to sort, thus we need to get (the coordinates of) the balls to check whether the current state is the goal state
+       ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(Tube) if ball != 'x']
+       if not ball_coords:
+           return actions
+
+
+       # If the state has at least 1 remaining ball, generate all possible actions from the current state, which includes moving the next ball in the tube to any other tube
+       else:
+           first_ball_coord = ball_coords[0]
+           for tube_ind in range(num_tubes):
+               # Check if the new state, containing the moved ball, would be valid; ie the tube must not be full
+               if len(state[tube_ind]) < 6:
+                   # Generate the new state
+                   new_state = [list(tube[:]) for tube in state]
+                   new_state[tube_ind].append(new_state[first_ball_coord[0]].pop(first_ball_coord[1]))
+                   new_state = tuple(tuple(tube) for tube in new_state)
+                   # The additional cost of this state is 1 as we are trying to minimize the number of moves
+                   new_cost = g + 1
+                  
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # The heuristic is the number of balls not in their correct tubes
+                       h = heuristic(new_state, colors)
+                       heapq.heappush(queue, (new_cost + h, new_cost, actions + [(first_ball_coord[0], first_ball_coord[1], tube_ind)], new_state))
+   return None
+
+
+
+
+def heuristic(state, colors):
+   # The heuristic is the number of balls not in their correct tubes
+   # This heuristic is admissible because it is a lower bound on the number of moves required to reach the goal state
+   # The heuristic is consistent because the cost of moving a ball to its correct tube is always 1, which is exactly the decrease in the heuristic value
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[i])):
+           if state[i][j] != 'x':
+               # Check if the ball is in its correct tube
+               if state[i][j] == state[i][0]:
+                   h += 1
+   return len(state) - h
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 5
+{'difficulty': 9, 'statement': "The game of 'Sort It' begins with 3 tubes, each filled with 4 balls of different colors. The goal is to sort the balls by color, with each tube containing balls of only one color. Only one ball can be moved at a time, taken from the top of one tube and placed on top of another. The capacity of each tube (maximum number of balls we can fit in each tube) is 6 balls. It is not allowed to place a ball in a tube that already has 6 balls. The solution should be a list of tuples, each containing, first, the index of the tube from which a ball is taken and, second, the index of the tube to which it is moved, indexing from 0. Given the initial state of the tubes, represented by the lists below (with the leftmost item being the color of the topmost ball in each tube), what is the shortest list of move tuples that will result in all the balls being correctly sorted? [['Green', 'Blue', 'Blue', 'Blue'], ['Red', 'Green', 'Red', 'Red'], ['Green', 'Red', 'Green', 'Blue']]", 'is_feasible': [[['Green', 'Blue', 'Blue', 'Blue'], ['Red', 'Green', 'Red', 'Red'], ['Green', 'Red', 'Green', 'Blue']], 6], 'is_correct': [[['Green', 'Blue', 'Blue', 'Blue'], ['Red', 'Green', 'Red', 'Red'], ['Green', 'Red', 'Green', 'Blue']], 6], 'Astar': ["[['Green', 'Blue', 'Blue', 'Blue'], ['Red', 'Green', 'Red', 'Red'], ['Green', 'Red', 'Green', 'Blue']]", '6'], 'opt': [[[1, 2], [1, 0], [2, 1], [2, 0], [2, 1], [2, 1], [2, 1], [0, 2], [0, 2], [0, 2], [1, 0], [1, 2]], 12, 0.08999156951904297]}
+Program returned None
+
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the tubes as a 2d tuple
+   initial_state = (('Green', 'Blue', 'Blue', 'Blue'),
+                   ('Red', 'Green', 'Red', 'Red'),
+                   ('Green', 'Red', 'Green', 'Blue'))
+   num_tubes = 3
+   # Create the set of the valid colors that could be in the tubes
+   colors = set(['Green', 'Blue', 'Red'])
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_tubes, colors, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_tubes, colors, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # The goal state must not have any balls left to sort, thus we need to get (the coordinates of) the balls to check whether the current state is the goal state
+       ball_coords = [(i, j) for i, tube in enumerate(state) for j, ball in enumerate(tube) if ball in colors]
+       if not ball_coords:
+           return actions
+
+
+       # If the state has at least 1 remaining ball to sort, generate all possible actions from the current state, which includes moving the next ball in the tubes to another tube
+       else:
+           first_ball_coord = ball_coords[0]
+           # The ball must be unique and not be present in any other tubes
+           used_balls  = set(ball for tube in state for ball in tube if ball in colors)
+           for tube_ind, tube in enumerate(state):
+               if tube_ind != first_ball_coord[0]:
+                   # Check if the new state, containing the new ball, would be valid; ie the ball must be unique and the tube must not be full
+                   if (state[first_ball_coord[0]][first_ball_coord[1]] not in used_balls and
+                       len(state[first_ball_coord[0]]) < 6 and
+                       len(state[tube_ind]) < 6):
+                  
+                       # Generate the new state
+                       new_state = [list(tube[:]) for tube in state]
+                       new_state[tube_ind].append(new_state[first_ball_coord[0]].pop(first_ball_coord[1]))
+                       new_state = tuple(tuple(tube) for tube in new_state)
+                       # The additional cost of this state is 1 as we are trying to minimize the number of moves
+                       new_cost = g + 1
+                      
+                       if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                           visited_costs[new_state] = new_cost
+                           # Relaxing the constraints on the columns sums and the diagonal sum to calculate the heuristic
+                           h = heuristic(new_state, colors)
+                           heapq.heappush(queue, (new_cost + h, new_cost, actions + [(first_ball_coord[0], tube_ind)], new_state))
+   return None
+
+
+
+
+def heuristic(state, colors):
+   # Relax the constraints on the columns sums and the diagonal sum to compute an admissible and consistent heuristic
+   # This heuristic considers the sum of the number of balls left to sort in the tubes
+   # The heuristic assumes that the balls can be sorted in the minimum number of moves, even if the tubes are not full, thus reporting a lower cost estimate to reach the goal state, making it admissible
+   # The heuristic is consistent, ie non-decreasing along the path to the goal state, because the cost of moving a ball in the grid is 1, which is always greater than or equal to the number used to fill that position in the heuristic
+   # Also the cost of the goal state is 0, as there are no balls left to sort in the tubes
+
+   h = 0
+   for i in range(len(state)):
+       for ball in state[i]:
+           if ball in colors:
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 6
+{'difficulty': 9, 'statement': "The game of 'Sort It' begins with 3 tubes, each filled with 4 balls of different colors. The goal is to sort the balls by color, with each tube containing balls of only one color. Only one ball can be moved at a time, taken from the top of one tube and placed on top of another. The capacity of each tube (maximum number of balls we can fit in each tube) is 6 balls. It is not allowed to place a ball in a tube that already has 6 balls. The solution should be a list of tuples, each containing, first, the index of the tube from which a ball is taken and, second, the index of the tube to which it is moved, indexing from 0. Given the initial state of the tubes, represented by the lists below (with the leftmost item being the color of the topmost ball in each tube), what is the shortest list of move tuples that will result in all the balls being correctly sorted? [['Blue', 'Green', 'Blue', 'Red'], ['Red', 'Blue', 'Green', 'Red'], ['Green', 'Green', 'Blue', 'Red']]", 'is_feasible': [[['Blue', 'Green', 'Blue', 'Red'], ['Red', 'Blue', 'Green', 'Red'], ['Green', 'Green', 'Blue', 'Red']], 6], 'is_correct': [[['Blue', 'Green', 'Blue', 'Red'], ['Red', 'Blue', 'Green', 'Red'], ['Green', 'Green', 'Blue', 'Red']], 6], 'Astar': ["[['Blue', 'Green', 'Blue', 'Red'], ['Red', 'Blue', 'Green', 'Red'], ['Green', 'Green', 'Blue', 'Red']]", '6'], 'opt': [[[0, 1], [0, 2], [0, 1], [0, 2], [1, 0], [1, 0], [1, 0], [1, 0], [2, 0], [1, 2], [1, 0], [2, 1], [2, 1], [2, 1], [2, 1], [2, 1], [0, 2], [0, 2], [0, 1], [0, 2], [1, 0], [1, 0]], 22, 7.465789318084717]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the tubes as a 2d tuple
+   initial_state = (('Blue', 'Green', 'Blue', 'Red'),
+                   ('Red', 'Blue', 'Green', 'Red'),
+                   ('Green', 'Green', 'Blue', 'Red'))
+   num_tubes = 3
+   max_capacity = 6
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_tubes, max_capacity, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_tubes, max_capacity, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # The goal state must be all tubes containing balls of only one color
+       if all(len(set(tube)) == 1 for tube in state):
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving a ball from one tube to another
+       for from_tube in range(num_tubes):
+           for to_tube in range(num_tubes):
+               if from_tube != to_tube and len(state[from_tube]) > 0 and len(state[to_tube]) < max_capacity:
+                   # The new state is the current state with the ball moved from the from_tube to the to_tube
+                   new_state = [list(tube[:]) for tube in state]
+                   new_state[to_tube].append(new_state[from_tube].pop())
+                   new_state = tuple(tuple(tube) for tube in new_state)
+                   # The cost so far is the number of moves made, as our objective is to minimize the number of moves required to sort the balls
+                   new_cost = g + 1
+                  
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # The heuristic is the number of balls not in their correct tubes
+                       h = heuristic(new_state)
+                       heapq.heappush(queue, (new_cost + h, new_cost, actions + [(from_tube, to_tube)], new_state))
+   return None
+
+
+
+
+def heuristic(state):
+   # The heuristic is the number of balls not in their correct tubes
+   # This heuristic is admissible because it is a lower bound on the number of moves required to sort the balls
+   # The heuristic is consistent because it never overestimates the cost to reach the goal state
+   return sum(len(tube) for tube in state if len(set(tube)) != 1)
+
+
+print(a_star())
+```
+llm code run result: [(1, 0), (2, 0), (1, 2), (1, 2), (0, 1), (0, 1), (0, 1), (0, 2), (0, 1), (2, 0), (2, 0), (2, 1), (2, 0), (1, 2), (1, 2)]
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+llama
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.6
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+6

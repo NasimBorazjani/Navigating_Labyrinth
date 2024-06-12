@@ -1,0 +1,63 @@
+{
+    "gpt_3.5_0shot_full_code": {
+        "IndexError": 8,
+        "Exceeded time limit. Killed": 36,
+        "TypeError": 16,
+        "ValueError": 18,
+        "misc": 8,
+        "AttributeError": 2,
+        "Returned None": 1,
+        "SyntaxError": 6,
+        "Incorrect solution format/data type": 1,
+        "total problem count": 96
+    },
+    "gpt_3.5_2part_Astar": {
+        "TypeError": 1,
+        "total problem count": 2
+    },
+    "gpt_3.5_2part_instances": {
+        "Not feasible": 12,
+        "Exceeded time limit. Killed": 26,
+        "Returned None": 42,
+        "misc": 1,
+        "total problem count": 96
+    },
+    "gpt_3.5_Astar_code_reasoning_full_code": {
+        "NameError": 60,
+        "TypeError": 17,
+        "misc": 4,
+        "Not feasible": 2,
+        "Exceeded time limit. Killed": 1,
+        "Returned None": 4,
+        "SyntaxError": 8,
+        "total problem count": 96
+    },
+    "gpt_4_0shot_full_code": {
+        "KeyError": 40,
+        "ValueError": 11,
+        "TypeError": 10,
+        "Not feasible": 7,
+        "Returned None": 5,
+        "Incorrect solution format/data type": 5,
+        "IndexError": 1,
+        "NameError": 1,
+        "SyntaxError": 1,
+        "total problem count": 96
+    },
+    "gpt_4_2part_instances": {
+        "Exceeded time limit. Killed": 11,
+        "Not feasible": 29,
+        "total problem count": 96
+    },
+    "gpt_4_Astar_code_reasoning_full_code": {
+        "TypeError": 9,
+        "ValueError": 25,
+        "Returned None": 18,
+        "NameError": 15,
+        "Not feasible": 4,
+        "misc": 4,
+        "KeyError": 1,
+        "Exceeded time limit. Killed": 3,
+        "total problem count": 96
+    }
+}

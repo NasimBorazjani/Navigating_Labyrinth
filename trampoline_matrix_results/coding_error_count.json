@@ -1,0 +1,46 @@
+{
+    "gpt_3.5_0shot_full_code": {
+        "Not feasible": 24,
+        "Returned None": 38,
+        "RecursionError": 16,
+        "SyntaxError": 1,
+        "Exceeded time limit. Killed": 6,
+        "Incorrect solution format/data type": 2,
+        "Incomplete generation": 16
+    },
+    "gpt_3.5_2part_instances": {
+        "Returned None": 4,
+        "Not feasible": 24,
+        "Incomplete generation": 11
+    },
+    "gpt_3.5_Astar_code_reasoning_full_code": {
+        "Returned None": 30,
+        "NameError": 3,
+        "Exceeded time limit. Killed": 12,
+        "SyntaxError": 14,
+        "TypeError": 1,
+        "KeyError": 1,
+        "Incomplete generation": 16
+    },
+    "gpt_4_0shot_full_code": {
+        "Returned None": 58,
+        "TypeError": 3,
+        "Exceeded time limit. Killed": 12,
+        "Incorrect solution format/data type": 1,
+        "Not feasible": 1,
+        "SyntaxError": 1
+    },
+    "gpt_4_2part_Astar": {
+        "Returned None": 3
+    },
+    "gpt_4_2part_instances": {
+        "ValueError": 25,
+        "Not feasible": 10,
+        "TypeError": 10
+    },
+    "gpt_4_Astar_code_reasoning_full_code": {
+        "Returned None": 49,
+        "ValueError": 1,
+        "SyntaxError": 1
+    }
+}

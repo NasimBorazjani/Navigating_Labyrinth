@@ -1,0 +1,821 @@
+6
+{'difficulty': 2, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[46, 82, 90], [36, 41, 38], [28, 55, '_']]", 'is_feasible': [[[46, 82, 90], [36, 41, 38], [28, 55, '_']]], 'is_correct': [[[46, 82, 90], [36, 41, 38], [28, 55, '_']]], 'Astar': ["[[46, 82, 90], [36, 41, 38], [28, 55, '_']]"], 'opt': [[38, 41, 82, 90, 41, 82, 55, 28, 36, 46, 90, 41, 82, 55, 41, 82, 55, 38], 18, 0.046418190002441406]}
+Program returned None
+```python
+import heapq
+from copy import deepcopy
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((46, 82, 90), (36, 41, 38), (28, 55, '_'))
+   num_rows = 3
+   num_cols = 3
+   # The goal state is the tiles in descending order, with the empty spot in the bottom right corner
+   goal_state = ((90, 82, 46), (55, 41, 38), (36, 28, '_'))
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes swapping the empty spot with any of the 4 neighboring tiles
+       # First, find the coordinates of the empty spot
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new tile is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the new tile
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of swaps made, as the task is to minimize the number of swaps required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the number of misplaced tiles in the current state
+                   h = heuristic(new_state, goal_state)
+                   # The action is the number on the tile that the empty spot is swapped with
+                   heapq.heappush(queue, (g + h, g + 1, actions + [new_state[empty_spot_coord[0]][empty_spot_coord[1]]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the count of misplaced tiles in the current state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each misplaced tile must be moved at least once
+   # It's consistent because moving a tile reduces the heuristic cost of the successor node by a max of 1 (if the moved tile is misplaced in the current state but not in the successor state), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles will be in their correct positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[i])):
+           if state[i][j] != goal[i][j]:
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:2  Admissible and consistent:1 
+
+
+10
+{'difficulty': 3, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[93, 88, 60], [28, 18, 24], ['_', 47, 53]]", 'is_feasible': [[[93, 88, 60], [28, 18, 24], ['_', 47, 53]]], 'is_correct': [[[93, 88, 60], [28, 18, 24], ['_', 47, 53]]], 'Astar': ["[[93, 88, 60], [28, 18, 24], ['_', 47, 53]]"], 'opt': [[47, 53, 24, 18, 28, 47, 53, 24, 18, 28, 47, 53, 24, 18], 14, 0.022923946380615234]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_10.py", line 71, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_10.py", line 52, in a_star
+    heapq.heappush(queue, (g + h, g + 1, actions + [new_state[new_row][new_col]], new_state))
+TypeError: '<' not supported between instances of 'str' and 'int'
+
+```python
+import heapq
+from copy import deepcopy
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((93, 88, 60), (28, 18, 24), ('_', 47, 53))
+   num_rows = 3
+   num_cols = 3
+   # The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner
+   goal_state = ((93, 88, 60), (53, 47, 28), (24, 18, '_'))
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If the current state is the goal state, return the actions taken
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring positions
+       # First, find the coordinates of the empty spot
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new position is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the tile at the new position
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the number of misplaced tiles in the current state
+                   h = heuristic(new_state, goal_state)
+                   # The action is the number on the tile that the empty spot is swapped with
+                   heapq.heappush(queue, (g + h, g + 1, actions + [new_state[new_row][new_col]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the count of misplaced tiles in the current state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each misplaced tile must be moved at least once
+   # It's consistent because moving a tile reduces the heuristic cost of the successor node by a max of 1 (if the moved tile is misplaced in the current state but not in the successor state), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles will be in their correct positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != goal[i][j]:
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:1  Recording Path:0  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:2  Admissible and consistent:1 
+
+
+16
+{'difficulty': 4, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[77, 81, 74], [93, 85, 98], [59, 53, '_']]", 'is_feasible': [[[77, 81, 74], [93, 85, 98], [59, 53, '_']]], 'is_correct': [[[77, 81, 74], [93, 85, 98], [59, 53, '_']]], 'Astar': ["[[77, 81, 74], [93, 85, 98], [59, 53, '_']]"], 'opt': [[53, 59, 93, 77, 81, 85, 98, 74, 85, 98, 77, 93, 59, 77, 93, 81, 98, 93, 77, 53], 20, 0.028780221939086914]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_16.py", line 71, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_16.py", line 23, in a_star
+    _, g, actions, state = heapq.heappop(queue)
+TypeError: '<' not supported between instances of 'int' and 'str'
+
+```python
+import heapq
+from copy import deepcopy
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((77, 81, 74), (93, 85, 98), (59, 53, '_'))
+   # Define the goal state of the puzzle
+   goal_state = ((98, 93, 85), (81, 77, 74), (59, 53, '_'))
+   num_rows = 3
+   num_cols = 3
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # Check if the current state is the goal state
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring tiles
+       # First, find the coordinates of the empty spot
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new tile is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the new tile
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the number of misplaced tiles in the current state
+                   h = heuristic(new_state, goal_state)
+                   # The action is the number on the tile that the empty spot is swapped with
+                   heapq.heappush(queue, (g + h, g + 1, actions + [new_state[new_row][new_col]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the count of misplaced tiles in the current state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each misplaced tile must be moved at least once
+   # It's consistent because moving a tile reduces the heuristic cost of the successor node by a max of 1 (if the moved tile is misplaced in the current state but not in the new one), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles will be in their correct positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[i])):
+           if state[i][j] != goal[i][j] and state[i][j] != '_':
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:1  Recording Path:0  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:2  Admissible and consistent:1 
+
+
+32
+{'difficulty': 3, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[69, 56, 8, 67], [15, 47, 44, 30], [73, '_', 24, 63]]", 'is_feasible': [[[69, 56, 8, 67], [15, 47, 44, 30], [73, '_', 24, 63]]], 'is_correct': [[[69, 56, 8, 67], [15, 47, 44, 30], [73, '_', 24, 63]]], 'Astar': ["[[69, 56, 8, 67], [15, 47, 44, 30], [73, '_', 24, 63]]"], 'opt': [[24, 44, 30, 63, 44, 30, 8, 67, 63, 44, 30, 8, 47, 15, 73, 24, 15, 56, 69, 73, 56, 47, 44, 30], 24, 0.1358938217163086]}
+LLM  program was killed because it exceeded the time limit.
+```python
+import heapq
+from collections import deque
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((69, 56, 8, 67), (15, 47, 44, 30), (73, '_', 24, 63))
+   num_rows = 3
+   num_cols = 4
+   # The goal state is the sorted list of all the numbers in the puzzle in descending order, with the empty spot at the end
+   goal_state = tuple(tuple(sorted([cell for row in initial_state for cell in row if cell != '_'], reverse=True)[i*num_cols:(i+1)*num_cols] for i in range(num_rows)))
+   # The empty spot is represented as '_'
+   empty_spot = '_'
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If the current state is the goal state, return the actions taken to reach the goal state
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring cells
+       # First, find the coordinates of the empty spot in the current state
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, cell in enumerate(row) if cell == empty_spot][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new cell is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the cell at the new coordinate
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the sum of the Manhattan distances of each cell from its position in the goal state
+                   h = heuristic(new_state, goal_state)
+                   # The action taken is the number on the tile that the empty spot is swapped with
+                   heapq.heappush(queue, (g + h, g + 1, actions + [int(new_state[empty_spot_coord[0]][empty_spot_coord[1]])], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the sum of the Manhattan distances of each cell from its position in the goal state
+   # The heuristic relaxes the constraint that only the empty spot can be moved, and that the tiles can only be moved to the empty spot
+   # It is admissible because it never overestimates the cost to reach the goal, as each tile must be moved at least the Manhattan distance to reach its position in the goal state
+   # It's consistent because moving a tile reduces the Manhattan distance of that tile to its goal position by 1 (equal to the cost of reaching the successor node), and does not change the Manhattan distance of any other tile. Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles are in their goal positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != '_':
+               goal_coord = [(x, y) for x, row in enumerate(goal) for y, cell in enumerate(row) if cell == state[i][j]][0]
+               h += abs(i - goal_coord[0]) + abs(j - goal_coord[1])
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:3  Admissible and consistent:1 
+
+
+35
+{'difficulty': 3, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[95, '_', 80, 18], [67, 66, 35, 94], [27, 26, 69, 53]]", 'is_feasible': [[[95, '_', 80, 18], [67, 66, 35, 94], [27, 26, 69, 53]]], 'is_correct': [[[95, '_', 80, 18], [67, 66, 35, 94], [27, 26, 69, 53]]], 'Astar': ["[[95, '_', 80, 18], [67, 66, 35, 94], [27, 26, 69, 53]]"], 'opt': [[66, 35, 94, 18, 80, 94, 69, 53, 18, 69, 35, 66, 94, 80, 69, 35, 53, 18], 18, 0.03965592384338379]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_35.py", line 73, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_35.py", line 53, in a_star
+    h = heuristic(new_state, goal_state)
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_35.py", line 68, in heuristic
+    goal_coord = [(x, y) for x, row in enumerate(goal) for y, cell in enumerate(row) if cell == state[i][j]][0]
+IndexError: list index out of range
+
+```python
+import heapq
+from collections import deque
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((95, '_', 80, 18),
+                   (67, 66, 35, 94),
+                   (27, 26, 69, 53))
+   num_rows = 3
+   num_cols = 4
+   # The goal state is a descending order of the numbers in the initial state, with the empty spot at the end
+   goal_state = tuple(tuple(sorted([cell for row in initial_state for cell in row if cell != '_'], reverse=True)[i*num_cols:(i+1)*num_cols]) for i in range(num_rows))
+   # The empty spot is represented as '_'
+   empty_spot = '_'
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring cells
+       # Get the coordinate of the empty spot
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, cell in enumerate(row) if cell == empty_spot][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new cell is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the new cell
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the sum of the Manhattan distances of each cell from its position in the goal state
+                   h = heuristic(new_state, goal_state)
+                   # The action is the number on the tile that the empty spot is swapped with
+                   heapq.heappush(queue, (g + h, g + 1, actions + [new_state[empty_spot_coord[0]][empty_spot_coord[1]]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the sum of the Manhattan distances of each cell from its position in the goal state
+   # The heuristic relaxes the constraint that only the empty spot can be moved, ie it presumes any cell can be moved directly to its goal position
+   # Thus the heuristic reports a lower estimate on the cost of reaching the goal state and is admissible
+   # The heuristic is consistent, ie non-decreasing along the path to the goal state, because the cost of moving the empty spot to an adjacent cell is 1, which is always greater than or equal to the decrease in the Manhattan distance of the moved cell
+   # Also the cost of the goal state is 0, as all cells are in their goal positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           goal_coord = [(x, y) for x, row in enumerate(goal) for y, cell in enumerate(row) if cell == state[i][j]][0]
+           h += abs(i - goal_coord[0]) + abs(j - goal_coord[1])
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:3  Admissible and consistent:1 
+
+
+66
+{'difficulty': 4, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[94, 91, 33, 29, 78], [97, 20, 14, 54, 25], [38, 22, 32, 17, '_']]", 'is_feasible': [[[94, 91, 33, 29, 78], [97, 20, 14, 54, 25], [38, 22, 32, 17, '_']]], 'is_correct': [[[94, 91, 33, 29, 78], [97, 20, 14, 54, 25], [38, 22, 32, 17, '_']]], 'Astar': ["[[94, 91, 33, 29, 78], [97, 20, 14, 54, 25], [38, 22, 32, 17, '_']]"], 'opt': [[25, 54, 14, 33, 91, 94, 97, 38, 22, 20, 33, 32, 17, 14, 29, 78, 54, 25], 18, 0.03129744529724121]}
+LLM  program was killed because it exceeded the time limit.
+```python
+import heapq
+from copy import deepcopy
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((94, 91, 33, 29, 78), (97, 20, 14, 54, 25), (38, 22, 32, 17, '_'))
+   num_rows = 3
+   num_cols = 5
+   # The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner
+   goal_state = ((97, 94, 91, 78, 33), (32, 29, 25, 22, 20), (17, 14, '_', '_', '_'))
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If the current state is the goal state, return the actions taken
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring positions
+       # Get the coordinates of the empty spot
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new position is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the tile at the new position
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the number of misplaced tiles in the current state
+                   h = heuristic(new_state, goal_state)
+                   # The action is the number on the tile that the empty spot is swapped with
+                   heapq.heappush(queue, (g + h, g + 1, actions + [int(state[new_row][new_col])], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the count of misplaced tiles in the current state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each misplaced tile must be moved at least once
+   # It's consistent because moving a tile reduces the heuristic cost of the successor node by a max of 1 (if the moved tile is in its correct position in the goal state), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles are in their correct positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != '_' and state[i][j] != goal[i][j]:
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:2  Admissible and consistent:1 
+
+
+78
+{'difficulty': 6, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[94, 92, 77, 88, '_'], [82, 43, 76, 85, 87], [24, 66, 17, 79, 75]]", 'is_feasible': [[[94, 92, 77, 88, '_'], [82, 43, 76, 85, 87], [24, 66, 17, 79, 75]]], 'is_correct': [[[94, 92, 77, 88, '_'], [82, 43, 76, 85, 87], [24, 66, 17, 79, 75]]], 'Astar': ["[[94, 92, 77, 88, '_'], [82, 43, 76, 85, 87], [24, 66, 17, 79, 75]]"], 'opt': [[87, 85, 76, 17, 66, 24, 82, 43, 24, 66, 17, 24, 43, 82, 66, 17, 79, 76, 24, 79, 17, 43, 79, 24, 76, 17, 24, 77, 88, 87, 85, 75], 32, 4.894534587860107]}
+LLM  program was killed because it exceeded the time limit.
+```python
+import heapq
+from copy import deepcopy
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple
+   initial_state = ((94, 92, 77, 88, '_'), (82, 43, 76, 85, 87), (24, 66, 17, 79, 75))
+   num_rows = 3
+   num_cols = 5
+   # The goal state is a descending order of the numbers in the initial state, with the empty spot at the end
+   goal_state = tuple(tuple(sorted([cell for row in initial_state for cell in row if cell != '_'], reverse=True)[i*num_cols:(i+1)*num_cols]) for i in range(num_rows))
+   # The empty spot is at the end of the goal state
+   goal_empty_spot = (num_rows - 1, num_cols - 1)
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If the current state is the goal state, return the actions taken
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring cells
+       # First, find the coordinates of the empty spot in the current state
+       empty_spot = [(i, j) for i in range(num_rows) for j in range(num_cols) if state[i][j] == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot[0] + d_row, empty_spot[1] + d_col
+           # Check if the new coordinate is valid, ie if the new cell is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the new cell
+               new_state[empty_spot[0]][empty_spot[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot[0]][empty_spot[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the Manhattan distance from the empty spot to its position in the goal state
+                   h = abs(empty_spot[0] - goal_empty_spot[0]) + abs(empty_spot[1] - goal_empty_spot[1])
+                   heapq.heappush(queue, (g + h, g + 1, actions + [new_state[empty_spot[0]][empty_spot[1]]], new_state))
+   return None
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:1  Admissible and consistent:1 
+
+
+80
+{'difficulty': 7, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[97, 78, '_', 9, 67], [18, 65, 52, 27, 66], [38, 92, 50, 14, 6]]", 'is_feasible': [[[97, 78, '_', 9, 67], [18, 65, 52, 27, 66], [38, 92, 50, 14, 6]]], 'is_correct': [[[97, 78, '_', 9, 67], [18, 65, 52, 27, 66], [38, 92, 50, 14, 6]]], 'Astar': ["[[97, 78, '_', 9, 67], [18, 65, 52, 27, 66], [38, 92, 50, 14, 6]]"], 'opt': [[9, 67, 66, 27, 14, 50, 92, 38, 18, 65, 52, 92, 38, 52, 92, 14, 50, 38, 14, 9, 78, 92, 52, 14, 9, 50, 38, 6], 28, 0.24241900444030762]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_80.py", line 71, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_80.py", line 23, in a_star
+    _, g, actions, state = heapq.heappop(queue)
+TypeError: '<' not supported between instances of 'str' and 'int'
+
+```python
+import heapq
+from collections import deque
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple of numbers in the puzzle
+   initial_state = ((97, 78, '_', 9, 67), (18, 65, 52, 27, 66), (38, 92, 50, 14, 6))
+   num_rows = 3
+   num_cols = 5
+   # The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner
+   goal_state = ((97, 92, 78, 67, 66), (65, 52, 50, 27, 18), (14, 9, 6, '_', '_'))
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If the current state is the goal state, return the actions taken
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes swapping the empty spot with any of the 4 neighboring tiles
+       for i in range(num_rows):
+           for j in range(num_cols):
+               if state[i][j] == '_':
+                   for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+                       new_row, new_col = i + d_row, j + d_col
+                       # Check if the new state would be valid, ie the new tile must be within the bounds of the puzzle
+                       if 0 <= new_row < num_rows and 0 <= new_col < num_cols and state[new_row][new_col] != '_':
+                           # Generate the new state
+                           new_state = [list(row[:]) for row in state]
+                           new_state[i][j], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[i][j]
+                           new_state = tuple(tuple(row) for row in new_state)
+                           # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+                           new_cost = g + 1
+
+
+                           if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                               visited_costs[new_state] = new_cost
+                               # The heuristic is the number of misplaced tiles in the current state
+                               h = heuristic(new_state, goal_state)
+                               # The tile that the empty spot is swapped with is the tile at the new_row and new_col
+                               heapq.heappush(queue, (g + h, g + 1, actions + [new_state[new_row][new_col]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the count of misplaced tiles in the current state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each misplaced tile must be moved at least once
+   # It's consistent because moving a tile reduces the heuristic cost of the successor node by a max of 1 (if the moved tile is misplaced in the current state but not in the successor state), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles will be in their correct positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != goal[i][j] and state[i][j] != '_':
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:0  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:2  Admissible and consistent:1 
+
+
+85
+{'difficulty': 8, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]", 'is_feasible': [[[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]], 'is_correct': [[[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]], 'Astar': ["[[93, 26, 39, 51, 69], [27, '_', 43, 7, 89], [63, 91, 23, 68, 17]]"], 'opt': [[26, 39, 51, 7, 43, 23, 91, 26, 27, 63, 26, 91, 23, 27, 91, 23, 27, 51, 39, 91, 51, 43, 89, 17, 68, 27, 43, 89, 17, 68, 27, 17, 7, 39, 89, 43, 17, 7, 39, 69, 68, 27], 42, 43.326194763183594]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_85.py", line 71, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_85.py", line 51, in a_star
+    heapq.heappush(queue, (g + heuristic(new_state, goal_state), g + 1, actions + [new_state[empty_spot_coord[0]][empty_spot_coord[1]]], new_state))
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_85.py", line 66, in heuristic
+    goal_i, goal_j = [(k, l) for k, row in enumerate(goal) for l, element in enumerate(row) if element == state[i][j]][0]
+IndexError: list index out of range
+
+```python
+import heapq
+from collections import deque
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple of numbers in the puzzle
+   initial_state = ((93, 26, 39, 51, 69), (27, '_', 43, 7, 89), (63, 91, 23, 68, 17))
+   num_rows = 3
+   num_cols = 5
+   # The goal state is the numbers in the puzzle in descending order, with the empty spot in the bottom right corner
+   goal_state = ((93, 91, 89, 69, 68), (63, 51, 43, 39, 27), (26, 23, 17, '_', '_'))
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # Check if the current state is the goal state
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring positions
+       # Get the coordinates of the empty spot
+       empty_spot_coords = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_']
+       for empty_spot_coord in empty_spot_coords:
+           for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+               new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+               # Check if the new coordinate is valid, ie if the new position is within the bounds of the puzzle
+               if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+                   # Generate the new state
+                   new_state = [list(row[:]) for row in state]
+                   # Swap the empty spot with the number in the new position
+                   new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+                   new_state = tuple(tuple(row) for row in new_state)
+                   # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+                   new_cost = g + 1
+
+
+                   if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                       visited_costs[new_state] = new_cost
+                       # The number that was swapped with the empty spot must be added to the actions
+                       heapq.heappush(queue, (g + heuristic(new_state, goal_state), g + 1, actions + [new_state[empty_spot_coord[0]][empty_spot_coord[1]]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the sum of the Manhattan distances from each number in the puzzle to its position in the goal state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each number must be moved at least once
+   # It's consistent because moving a number from one position to another reduces the heuristic cost of the successor node by a max of 1 (if the moved number's position in the new state is closer to its position in the goal state than in the old state), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all numbers will be in their goal positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != '_':
+               goal_i, goal_j = [(k, l) for k, row in enumerate(goal) for l, element in enumerate(row) if element == state[i][j]][0]
+               h += abs(i - goal_i) + abs(j - goal_j)
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:1  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:3  Admissible and consistent:1 
+
+
+94
+{'difficulty': 5, 'statement': "In the 8-puzzle game, you are given a grid with numbered square tiles arranged randomly and one tile missing. The goal is to arrange the tiles in descending order by sliding them into the empty space. The tiles can move in 4 directions: left, right, up, and down.  Given the initial state of the puzzle below, where the empty spot is represented as “_”, provide the shortest list of tiles that need to be swapped with the empty spot to achieve the goal state. The goal state is when all tiles are in descending order, with the largest number in the top left corner, and the empty spot is in the bottom right corner. The solution should be a list of numbers in Python format, where each number represents the number on the tile that the empty spot is swapped with at each turn. Initial state of the puzzle: [[98, 30, 85, 44, 59, 40], [56, 68, 50, 61, 47, 15], [37, 48, 24, 81, 22, '_']]", 'is_feasible': [[[98, 30, 85, 44, 59, 40], [56, 68, 50, 61, 47, 15], [37, 48, 24, 81, 22, '_']]], 'is_correct': [[[98, 30, 85, 44, 59, 40], [56, 68, 50, 61, 47, 15], [37, 48, 24, 81, 22, '_']]], 'Astar': ["[[98, 30, 85, 44, 59, 40], [56, 68, 50, 61, 47, 15], [37, 48, 24, 81, 22, '_']]"], 'opt': [[15, 40, 59, 44, 61, 50, 68, 30, 85, 68, 50, 81, 24, 48, 30, 50, 81, 47, 44, 61, 68, 81, 48, 24, 22, 15], 26, 0.07562923431396484]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_94.py", line 71, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./8_puzzle_results/gpt_4_Astar_code_reasoning_full_code/gpt_4_Astar_code_reasoning_full_code_python_scripts/problem_94.py", line 52, in a_star
+    heapq.heappush(queue, (g + h, g + 1, actions + [new_state[new_row][new_col]], new_state))
+TypeError: '<' not supported between instances of 'str' and 'int'
+
+```python
+import heapq
+from collections import deque
+
+
+def a_star():
+   # Define the initial state of the puzzle, as a 2d tuple of numbers in the puzzle
+   initial_state = ((98, 30, 85, 44, 59, 40), (56, 68, 50, 61, 47, 15), (37, 48, 24, 81, 22, '_'))
+   num_rows = 3
+   num_cols = 6
+   # The goal state is the puzzle sorted in descending order
+   goal_state = tuple(tuple(range(98, 98 - num_cols, -1)) for _ in range(num_rows))
+   goal_state = tuple(list(row)[:-1] + ['_'] if i == num_rows - 1 else row for i, row in enumerate(goal_state))
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # Check if the current state is the goal state
+       if state == goal_state:
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the empty spot to any of the 4 neighboring positions
+       # First, find the coordinates of the empty spot
+       empty_spot_coord = [(i, j) for i, row in enumerate(state) for j, element in enumerate(row) if element == '_'][0]
+       for d_row, d_col in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+           new_row, new_col = empty_spot_coord[0] + d_row, empty_spot_coord[1] + d_col
+           # Check if the new coordinate is valid, ie if the new position is within the bounds of the puzzle
+           if 0 <= new_row < num_rows and 0 <= new_col < num_cols:
+               # Generate the new state
+               new_state = [list(row[:]) for row in state]
+               # Swap the empty spot with the number in the new position
+               new_state[empty_spot_coord[0]][empty_spot_coord[1]], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[empty_spot_coord[0]][empty_spot_coord[1]]
+               new_state = tuple(tuple(row) for row in new_state)
+               # The cost so far is the number of moves made, as the task is to minimize the number of moves required
+               new_cost = g + 1
+
+
+               if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                   visited_costs[new_state] = new_cost
+                   # The heuristic is the number of misplaced tiles in the current state
+                   h = heuristic(new_state, goal_state)
+                   heapq.heappush(queue, (g + h, g + 1, actions + [new_state[new_row][new_col]], new_state))
+   return None
+
+
+def heuristic(state, goal):
+   # An admissible and consistent heuristic for this problem is the count of misplaced tiles in the current state
+   # This heuristic relaxes the constraint that only the empty spot can be moved
+   # It is admissible because it never overestimates the cost to reach the goal, as each misplaced tile must be moved at least once
+   # It's consistent because moving a tile reduces the heuristic cost of the successor node by a max of 1 (if the moved tile is in its correct position in the goal state), which is equal to the cost of reaching the successor node
+   # Thus h(n) is always less than or equal to c(n, n’)(equal to 1) + h(n’)
+   # And the cost of the goal state is 0, as all tiles are in their correct positions
+   h = 0
+   for i in range(len(state)):
+       for j in range(len(state[0])):
+           if state[i][j] != goal[i][j]:
+               h += 1
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+Initial State:1  Goal State:0  Recording Path:0  Exit Check:1  Iterating Through Possible Actions:1  Generate New State:1  Recording Cost:1  Heuristic Implemented:1 Heuristic Efficiency:2  Admissible and consistent:1 
+
+
+Total:
+Initial State:10  Goal State:2  Recording Path:6  Exit Check:10  Iterating Through Possible Actions:10  Generate New State:10  Recording Cost:10  Heuristic Implemented:10 Heuristic Efficiency:2.2  Admissible and consistent:10 

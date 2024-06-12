@@ -1,0 +1,292 @@
+model: gpt_3.5 
+
+
+ID: 1
+{'difficulty': 6, 'statement': "In the magic square problem, a 3x3 grid is filled with unique integers ranging from 29 to 48. Some numbers are already given, while others are unknown and represented as 'x'. Sum of column 1 (counting from 0) must be 107, and sum of row 1 must be 103. Also, the sum of the numbers in the diagonal from the top right to the bottom left corner of the grid should equal 124. The goal is to find unique integers (ie each number can be in the final grid only once) in the given range to replace with ‘x’s in the grid below such that the sum of the specified rows, columns, and diagonal equals the given amounts and the sum of all of the numbers in the grid is as low as possible. The solution should be provided as a list of tuples in Python syntax. Each tuple should contain three numbers for each 'x' position: the row index, the column index (both starting from 0), and the value of the unique integer replaced with 'x' at that position.\n\nGrid:\n [['35' 'x' '46']\n ['x' 'x' 'x']\n ['x' 'x' 'x']]", 'is_feasible': ["[['35', '', '46'], ['', '', ''], ['', '', '']]", 3, 29, 48], 'is_correct': ["[['35', '', '46'], ['', '', ''], ['', '', '']]", 29, 48, [1, 2], [1, 2], [107], [103], 124], 'Astar': ["[['35', '', '46'], ['', '', ''], ['', '', '']]", '29', '48', '[None, 107, None]', '[None, 103, None]', '124'], 'opt': [[[0, 1, 31], [1, 0, 29], [1, 1, 44], [1, 2, 30], [2, 0, 34], [2, 1, 32], [2, 2, 33]], 314, 0.5518617630004883]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./magic_square_results/gpt_3.5_Astar_2part_/gpt_3.5_2part_Astar_python_scripts/full_Astar_problem_1.py", line 75, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./magic_square_results/gpt_3.5_Astar_2part_/gpt_3.5_2part_Astar_python_scripts/full_Astar_problem_1.py", line 61, in a_star
+    heapq.heappush(queue, (new_cost + heuristic(new_state, row_sum, col_sum, diagonal_sum), new_cost, actions + [(i, j, num)], new_state, new_available_numbers))
+  File "/home/nasimb/Astar/./magic_square_results/gpt_3.5_Astar_2part_/gpt_3.5_2part_Astar_python_scripts/full_Astar_problem_1.py", line 72, in heuristic
+    return sum(available_numbers)
+NameError: name 'available_numbers' is not defined
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the grid, with 'x' representing unknown numbers
+   initial_state = [['35', 'x', '46'],
+                    ['x', 'x', 'x'],
+                    ['x', 'x', 'x']]
+  
+   # Encoding other variables given in the problem statement
+   num_rows = 3
+   num_cols = 3
+   row_sum = [103, None, None]
+   col_sum = [107, None, None]
+   diagonal_sum = 124
+   available_numbers = set(range(29, 49))
+
+
+   visited_costs = {}
+   visited_costs[tuple(tuple(row) for row in initial_state)] = 0
+
+
+   queue = []
+   # No actions taken in the initial state
+   heapq.heappush(queue, (0, 0, [], initial_state, available_numbers))
+  
+   return initial_state, num_rows, num_cols, row_sum, col_sum, diagonal_sum, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_rows, num_cols, row_sum, col_sum, diagonal_sum, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state, available_numbers = heapq.heappop(queue)
+
+
+       # If there are no remaining unknown numbers in the grid, check if the sums of rows, columns, and diagonal match the specified values
+       if all(sum(int(cell) if cell != 'x' else 0 for cell in row) == sum_val if sum_val is not None else True for row, sum_val in zip(state, row_sum)) and \
+          all(sum(int(row[i]) if row[i] != 'x' else 0 for row in state) == sum_val if sum_val is not None else True for i, sum_val in enumerate(col_sum)) and \
+          sum(int(state[i][i]) if state[i][i] != 'x' else 0 for i in range(num_rows)) == diagonal_sum:
+           return actions
+
+
+       # If the state has at least 1 remaining unknown number, generate all possible actions from the current state
+       if any('x' in row for row in state):
+           for i in range(num_rows):
+               for j in range(num_cols):
+                   if state[i][j] == 'x':
+                       for num in available_numbers:
+                           new_state = [list(row) for row in state]
+                           new_state[i][j] = str(num)
+                           new_state = [tuple(row) for row in new_state]
+                           new_available_numbers = available_numbers.copy()
+                           new_available_numbers.remove(num)
+                           new_cost = g + num
+                           new_state_tuple = tuple(new_state)
+                           if new_state_tuple not in visited_costs or new_cost < visited_costs[new_state_tuple]:
+                               visited_costs[new_state_tuple] = new_cost
+                               heapq.heappush(queue, (new_cost + heuristic(new_state, row_sum, col_sum, diagonal_sum), new_cost, actions + [(i, j, num)], new_state, new_available_numbers))
+   return None
+
+
+
+
+def heuristic(state, row_sum, col_sum, diagonal_sum):
+   # An admissible and consistent heuristic for this problem is the sum of the remaining unique numbers that can be added to the grid
+   # The heuristic relaxes the constraint that the numbers in the grid must be unique, as it presumes we can add any of the remaining unique numbers to the grid
+   # Thus the heuristic reports a lower estimate on the cost to reach the goal state and is admissible
+   # The heuristic is consistent because the estimated cost of the next node is higher if a number is added to the grid, or equal or less by at most the value of the number added, which is exactly the cost of reaching the successor node
+   return sum(available_numbers)
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty': 7, 'statement': "In the magic square problem, a 3x3 grid is filled with unique integers ranging from 20 to 39. Some numbers are already given, while others are unknown and represented as 'x'. Sum of column 1 (counting from 0) must be 82, and sum of row 1 must be 87. Also, the sum of the numbers in the diagonal from the top right to the bottom left corner of the grid should equal 94. The goal is to find unique integers (ie each number can be in the final grid only once) in the given range to replace with ‘x’s in the grid below such that the sum of the specified rows, columns, and diagonal equals the given amounts and the sum of all of the numbers in the grid is as low as possible. The solution should be provided as a list of tuples in Python syntax. Each tuple should contain three numbers for each 'x' position: the row index, the column index (both starting from 0), and the value of the unique integer replaced with 'x' at that position.\n\nGrid:\n [['x' 'x' 'x']\n ['30' 'x' 'x']\n ['x' 'x' 'x']]", 'is_feasible': ["[['', '', ''], ['30', '', ''], ['', '', '']]", 3, 20, 39], 'is_correct': ["[['', '', ''], ['30', '', ''], ['', '', '']]", 20, 39, [1, 2], [1, 2], [82], [87], 94], 'Astar': ["[['', '', ''], ['30', '', ''], ['', '', '']]", '20', '39', '[None, 82, None]', '[None, 87, None]', '94'], 'opt': [[[0, 0, 20], [0, 1, 22], [0, 2, 25], [1, 1, 36], [1, 2, 21], [2, 0, 33], [2, 1, 24], [2, 2, 23]], 234, 3.3074212074279785]}
+LLM  program was killed because it exceeded the time limit.
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the grid, with 'x' representing unknown numbers
+   initial_state = [['x', 'x', 'x'],
+                    ['30', 'x', 'x'],
+                    ['x', 'x', 'x']]
+  
+   # Encoding other variables given in the problem statement
+   num_rows = 3
+   num_cols = 3
+   row_sum = [0, 87, 0]
+   col_sum = [82, 0, 0]
+   diagonal_sum = 94
+   available_numbers = set(range(20, 40))
+
+
+   visited_costs = {}
+   visited_costs[str(initial_state)] = 0
+
+
+   queue = []
+   # No actions taken in the initial state
+   heapq.heappush(queue, (0, 0, [], initial_state))
+  
+   return initial_state, num_rows, num_cols, row_sum, col_sum, diagonal_sum, available_numbers, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_rows, num_cols, row_sum, col_sum, diagonal_sum, available_numbers, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If there are no remaining unknown numbers in the grid, and the sums of rows, columns, and diagonal match the specified values, return the actions taken
+       if all(sum(int(cell) if cell != 'x' else 0 for cell in row) == row_sum[i] for i, row in enumerate(state)) and \
+          all(sum(int(row[j]) if row[j] != 'x' else 0 for row in state) == col_sum[j] for j in range(num_cols)) and \
+          sum(int(state[i][i]) if state[i][i] != 'x' else 0 for i in range(num_rows)) == diagonal_sum:
+           return actions
+
+
+       # If the state has at least 1 remaining unknown number, generate all possible actions from the current state
+       if any(cell == 'x' for row in state for cell in row):
+           for i in range(num_rows):
+               for j in range(num_cols):
+                   if state[i][j] == 'x':
+                       for num in available_numbers:
+                           new_state = [list(row) for row in state]
+                           new_state[i][j] = str(num)
+                           new_state = [tuple(row) for row in new_state]
+                           new_available_numbers = available_numbers.copy()
+                           new_available_numbers.remove(num)
+                           new_cost = g + num
+                           new_state_str = str(new_state)
+
+
+                           if new_state_str not in visited_costs or new_cost < visited_costs[new_state_str]:
+                               visited_costs[new_state_str] = new_cost
+                               heapq.heappush(queue, (new_cost + heuristic(new_state, row_sum, col_sum, diagonal_sum, new_available_numbers), new_cost, actions + [(i, j, num)], new_state))
+   return None
+
+
+
+
+def heuristic(state, row_sum, col_sum, diagonal_sum, available_numbers):
+   # An admissible and consistent heuristic for this problem is the sum of the remaining unique numbers that can be added to the grid
+   # The heuristic relaxes the constraint that the numbers in the grid must be unique, as it presumes we can add any of the remaining unique numbers to the grid
+   # Thus the heuristic reports a lower estimate on the cost of reaching the goal state and is admissible
+   # The heuristic is consistent because the estimated cost of the next node is higher if a number is added to the grid, or equal or less by at most 1 (equal to the cost of reaching the successor node, ie one action) as the maximum number that can be added to the grid is the smallest number in the remaining unique numbers, which is exactly the number added to the grid in the heuristic. Thus h(n) can never be greater than c(n, n’)(equal to 1) + h(n’)
+   return sum(available_numbers)
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 3
+{'difficulty': 7, 'statement': "In the magic square problem, a 3x3 grid is filled with unique integers ranging from 20 to 39. Some numbers are already given, while others are unknown and represented as 'x'. Sum of column 1 (counting from 0) must be 99, and sum of row 1 must be 86. Also, the sum of the numbers in the diagonal from the top right to the bottom left corner of the grid should equal 76. The goal is to find unique integers (ie each number can be in the final grid only once) in the given range to replace with ‘x’s in the grid below such that the sum of the specified rows, columns, and diagonal equals the given amounts and the sum of all of the numbers in the grid is as low as possible. The solution should be provided as a list of tuples in Python syntax. Each tuple should contain three numbers for each 'x' position: the row index, the column index (both starting from 0), and the value of the unique integer replaced with 'x' at that position.\n\nGrid:\n [['25' 'x' 'x']\n ['x' 'x' 'x']\n ['x' 'x' 'x']]", 'is_feasible': ["[['25', '', ''], ['', '', ''], ['', '', '']]", 3, 20, 39], 'is_correct': ["[['25', '', ''], ['', '', ''], ['', '', '']]", 20, 39, [1, 2], [1, 2], [99], [86], 76], 'Astar': ["[['25', '', ''], ['', '', ''], ['', '', '']]", '20', '39', '[None, 99, None]', '[None, 86, None]', '76'], 'opt': [[[0, 1, 26], [0, 2, 20], [1, 0, 23], [1, 1, 35], [1, 2, 28], [2, 0, 21], [2, 1, 38], [2, 2, 22]], 238, 6.698022365570068]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+
+
+def initialize():
+    # Define the initial state of the grid, with 'x' representing unknown numbers
+    initial_state = [['25', 'x', 'x'], ['x', 'x', 'x'], ['x', 'x', 'x']]
+    # Define the goal sums for the rows, columns, and diagonal
+    goal_sums = [86, 99, 76]
+    # Define the range of unique integers that can be placed in the grid
+    unique_integers = set(range(20, 40))
+
+    visited_costs = {}
+    visited_costs[str(initial_state)] = 0
+
+    queue = []
+    # No actions taken in the initial state
+    heapq.heappush(queue, (0, 0, [], initial_state))
+
+    return initial_state, goal_sums, unique_integers, visited_costs, queue
+
+
+def a_star():
+    initial_state, goal_sums, unique_integers, visited_costs, queue = initialize()
+
+    while queue:
+        _, g, actions, state = heapq.heappop(queue)
+
+        # Unpack the state information
+        state_str = str(state)
+
+        # If the state has at least 1 remaining unknown number, generate all possible actions
+        if 'x' in [cell for row in state for cell in row]:
+            for row_idx, row in enumerate(state):
+                for col_idx, cell in enumerate(row):
+                    if cell == 'x':
+                        for num in unique_integers:
+                            new_state = [list(row) for row in state]
+                            new_state[row_idx][col_idx] = str(num)
+                            new_state_str = str(new_state)
+                            new_cost = g + 1
+
+                            if new_state_str not in visited_costs or new_cost < visited_costs[new_state_str]:
+                                visited_costs[new_state_str] = new_cost
+                                heapq.heappush(queue, (new_cost + heuristic(new_state, goal_sums, unique_integers), new_cost, actions + [(row_idx, col_idx, num)], new_state))
+        else:
+            return actions
+
+    return None
+
+
+def heuristic(state, goal_sums, unique_integers):
+    # Convert 'x' to 0 to avoid errors when calculating sums
+    state = [[int(cell) if cell != 'x' else 0 for cell in row] for row in state]
+
+    # Calculate the sum of each row, column, and diagonal
+    row_sums = [sum(row) for row in state]
+    col_sums = [sum(col) for col in zip(*state)]
+    diag_sum1 = sum(state[i][i] for i in range(3))
+    diag_sum2 = sum(state[i][2 - i] for i in range(3))
+
+    # Calculate the difference between the current sum and the goal sum for each row, column, and diagonal
+    row_diff = sum(abs(row_sum - goal_sum) for row_sum, goal_sum in zip(row_sums, goal_sums))
+    col_diff = sum(abs(col_sum - goal_sum) for col_sum, goal_sum in zip(col_sums, goal_sums))
+    diag_diff1 = abs(diag_sum1 - goal_sums[2])
+    diag_diff2 = abs(diag_sum2 - goal_sums[2])
+
+    # Calculate the total heuristic value as the sum of differences
+    h = row_diff + col_diff + diag_diff1 + diag_diff2
+
+    return h
+
+
+print(a_star())
+```
+llm code run result: [(1, 1, 39), (0, 2, 39), (1, 0, 39), (2, 1, 39), (2, 2, 37), (0, 1, 21), (1, 2, 20), (2, 0, 20)]
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+gpt_3.5
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.5
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+16
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+3

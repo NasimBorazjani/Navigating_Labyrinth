@@ -1,0 +1,303 @@
+model: gpt_4 
+
+
+ID: 1
+{'difficulty': 4, 'statement': "In 'Restricted Sorting', there are 6 stacks each with a capacity of 4 blocks, with 3 stacks filled with blocks of varying shades and the remaining are empty. The challenge is to sort the blocks by shade such that if a stack is not empty, it is stacked with 3 blocks of a single shade. The player can only transfer one block at a time from the top of a stack to an empty stack or to a stack that has only blocks of that shade, without exceeding the stacks’ capacity. Transferring blocks to certain stacks is more expensive than others. The cost of moving one block to the top of each stack is: {0: 5, 1: 5, 2: 3, 3: 1, 4: 5, 5: 1}, where the keys are the index of each stack, indexing from 0. The cost of moving a block is always at least 1. The solution should be a list of tuples, each containing, first, the index of the stack from which a block is picked up from and, second, the index of the stack to which it is transferred, indexing from 0. Given the initial state of the stacks, represented by the lists below (with the leftmost item being the shade of the topmost block in each stack)(and the first stack being the stack at index 0), what is the list of transfer pairs (reported in python syntax) with the least possible cost, that will result in all the blocks being correctly sorted? [[], [], [], ['Blue', 'Yellow', 'Blue', 'Blue'], ['Red', 'Green', 'Yellow', 'Green'], ['Red', 'Red', 'Yellow', 'Green']]", 'is_feasible': [[[], [], [], ['Blue', 'Yellow', 'Blue', 'Blue'], ['Red', 'Green', 'Yellow', 'Green'], ['Red', 'Red', 'Yellow', 'Green']], 4, {'0': 5, '1': 5, '2': 3, '3': 1, '4': 5, '5': 1}], 'is_correct': [[[], [], [], ['Blue', 'Yellow', 'Blue', 'Blue'], ['Red', 'Green', 'Yellow', 'Green'], ['Red', 'Red', 'Yellow', 'Green']], 4, {'0': 5, '1': 5, '2': 3, '3': 1, '4': 5, '5': 1}, 3], 'Astar': ["[[], [], [], ['Blue', 'Yellow', 'Blue', 'Blue'], ['Red', 'Green', 'Yellow', 'Green'], ['Red', 'Red', 'Yellow', 'Green']]", '{0: 5, 1: 5, 2: 3, 3: 1, 4: 5, 5: 1}', '4', '3'], 'opt': [[[4, 0], [5, 0], [5, 0], [3, 1], [3, 2], [5, 2], [4, 5], [4, 2], [1, 3], [4, 5]], 32, 0.06039690971374512]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./restricted_sorting_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_1.py", line 81, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./restricted_sorting_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_1.py", line 55, in a_star
+    h = heuristic(new_state, stack_costs)
+  File "/home/nasimb/Astar/./restricted_sorting_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_1.py", line 76, in heuristic
+    min_cost_stack = min([i for i in range(len(state)) if not state[i] or state[i][-1] == block], key=lambda x: stack_costs[x])
+ValueError: min() arg is an empty sequence
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the stacks as a tuple of tuples
+   initial_state = ((), (), (), ('Blue', 'Yellow', 'Blue', 'Blue'), ('Red', 'Green', 'Yellow', 'Green'), ('Red', 'Red', 'Yellow', 'Green'))
+   num_stacks = 6
+   stack_capacity = 4
+   # Define the cost of moving a block to each stack
+   stack_costs = {0: 5, 1: 5, 2: 3, 3: 1, 4: 5, 5: 1}
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_stacks, stack_capacity, stack_costs, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_stacks, stack_capacity, stack_costs, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If all stacks are either empty or contain blocks of a single shade, return the actions taken
+       if all(len(set(stack)) <= 1 for stack in state):
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the top block from any stack to any other stack
+       for from_stack_ind in range(num_stacks):
+           # Check if the stack is not empty
+           if state[from_stack_ind]:
+               for to_stack_ind in range(num_stacks):
+                   # Check if the stack is not full and if the stack is either empty or the top block is of the same shade as the block to be moved
+                   if (len(state[to_stack_ind]) < stack_capacity and
+                       (not state[to_stack_ind] or state[to_stack_ind][-1] == state[from_stack_ind][-1])):
+                       # Generate the new state
+                       new_state = list(list(stack) for stack in state)
+                       new_state[to_stack_ind].append(new_state[from_stack_ind].pop())
+                       new_state = tuple(tuple(stack) for stack in new_state)
+                       # The cost of moving a block to a stack is the cost of the stack
+                       new_cost = g + stack_costs[to_stack_ind]
+
+
+                       if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                           visited_costs[new_state] = new_cost
+                           # The heuristic is the sum of the costs of moving a block to each stack, weighted by the number of blocks that need to be moved to each stack
+                           h = heuristic(new_state, stack_costs)
+                           heapq.heappush(queue, (new_cost + h, new_cost, actions + [(from_stack_ind, to_stack_ind)], new_state))
+   return None
+
+
+
+
+def heuristic(state, stack_costs):
+   # The heuristic function can be the sum of the costs of moving a block to each stack, weighted by the number of blocks that need to be moved to each stack
+   # This heuristic is admissible because it is greedy, always opting for the action that sorts the blocks the most, ensuring it never overestimates the cost to reach the goal
+   # The heuristic is consistent as the estimated cost of the next node is higher if a block is moved to a stack with a higher cost, or equal or less by at most the cost of moving a block to the stack (equal to the cost of reaching the successor node, ie one action) as the maximum number of blocks that can be moved to a stack is the capacity of the stack, which is exactly the number of blocks moved to the stack in the heuristic. Thus h(n) can never be greater than c(n, n’)(equal to the cost of moving a block to the stack) + h(n’)
+   h = 0
+   # Count the number of blocks of each shade
+   block_counts = {}
+   for stack in state:
+       for block in stack:
+           if block not in block_counts:
+               block_counts[block] = 0
+           block_counts[block] += 1
+   # For each shade, find the stack with the minimum cost that has blocks of that shade or is empty, and add the cost of moving a block to that stack, weighted by the number of blocks of that shade, to the heuristic
+   for block, count in block_counts.items():
+       min_cost_stack = min([i for i in range(len(state)) if not state[i] or state[i][-1] == block], key=lambda x: stack_costs[x])
+       h += stack_costs[min_cost_stack] * count
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 2
+{'difficulty': 4, 'statement': "In 'Restricted Sorting', there are 6 stacks each with a capacity of 4 blocks, with 3 stacks filled with blocks of varying shades and the remaining are empty. The challenge is to sort the blocks by shade such that if a stack is not empty, it is stacked with 3 blocks of a single shade. The player can only transfer one block at a time from the top of a stack to an empty stack or to a stack that has only blocks of that shade, without exceeding the stacks’ capacity. Transferring blocks to certain stacks is more expensive than others. The cost of moving one block to the top of each stack is: {0: 5, 1: 3, 2: 3, 3: 1, 4: 3, 5: 2}, where the keys are the index of each stack, indexing from 0. The cost of moving a block is always at least 1. The solution should be a list of tuples, each containing, first, the index of the stack from which a block is picked up from and, second, the index of the stack to which it is transferred, indexing from 0. Given the initial state of the stacks, represented by the lists below (with the leftmost item being the shade of the topmost block in each stack)(and the first stack being the stack at index 0), what is the list of transfer pairs (reported in python syntax) with the least possible cost, that will result in all the blocks being correctly sorted? [['Red', 'Green', 'Red', 'Blue'], ['Red', 'Yellow', 'Yellow', 'Green'], [], ['Blue', 'Yellow', 'Green', 'Blue'], [], []]", 'is_feasible': [[['Red', 'Green', 'Red', 'Blue'], ['Red', 'Yellow', 'Yellow', 'Green'], [], ['Blue', 'Yellow', 'Green', 'Blue'], [], []], 4, {'0': 5, '1': 3, '2': 3, '3': 1, '4': 3, '5': 2}], 'is_correct': [[['Red', 'Green', 'Red', 'Blue'], ['Red', 'Yellow', 'Yellow', 'Green'], [], ['Blue', 'Yellow', 'Green', 'Blue'], [], []], 4, {'0': 5, '1': 3, '2': 3, '3': 1, '4': 3, '5': 2}, 3], 'Astar': ["[['Red', 'Green', 'Red', 'Blue'], ['Red', 'Yellow', 'Yellow', 'Green'], [], ['Blue', 'Yellow', 'Green', 'Blue'], [], []]", '{0: 5, 1: 3, 2: 3, 3: 1, 4: 3, 5: 2}', '4', '3'], 'opt': [[[1, 2], [0, 2], [1, 5], [1, 5], [0, 1], [0, 2], [3, 4], [3, 5], [3, 1], [0, 3], [4, 3]], 26, 0.10936236381530762]}
+LLM  program returned the following error: Traceback (most recent call last):
+  File "/home/nasimb/Astar/./restricted_sorting_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_2.py", line 75, in <module>
+    print(a_star())
+  File "/home/nasimb/Astar/./restricted_sorting_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_2.py", line 55, in a_star
+    h = heuristic(new_state, stack_costs)
+  File "/home/nasimb/Astar/./restricted_sorting_results/gpt_4_Astar_2part/gpt_4_2part_Astar_python_scripts/full_Astar_problem_2.py", line 70, in heuristic
+    min_cost = min(stack_costs[j] for j in range(len(state)) if len(state[j]) < 4 and (not state[j] or state[j][-1] == state[i][-1]))
+ValueError: min() arg is an empty sequence
+
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the stacks as a tuple of tuples
+   initial_state = (('Red', 'Green', 'Red', 'Blue'), ('Red', 'Yellow', 'Yellow', 'Green'), (), ('Blue', 'Yellow', 'Green', 'Blue'), (), ())
+   num_stacks = 6
+   stack_capacity = 4
+   # Define the cost of moving a block to each stack
+   stack_costs = {0: 5, 1: 3, 2: 3, 3: 1, 4: 3, 5: 2}
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_stacks, stack_capacity, stack_costs, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_stacks, stack_capacity, stack_costs, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # Check if the current state is the goal state, ie if all the stacks are empty or contain blocks of a single shade
+       if all(len(set(stack)) <= 1 for stack in state):
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the top block from any stack to any other stack
+       for from_stack_ind in range(num_stacks):
+           # Check if the stack is not empty
+           if state[from_stack_ind]:
+               for to_stack_ind in range(num_stacks):
+                   # Check if the stack is not full and if the stack is empty or the top block is of the same shade as the block to be moved
+                   if (len(state[to_stack_ind]) < stack_capacity and
+                       (not state[to_stack_ind] or state[to_stack_ind][-1] == state[from_stack_ind][-1])):
+                       # Generate the new state
+                       new_state = list(list(stack) for stack in state)
+                       new_state[to_stack_ind].append(new_state[from_stack_ind].pop())
+                       new_state = tuple(tuple(stack) for stack in new_state)
+                       # The cost of the new state is the cost of moving a block to the stack
+                       new_cost = g + stack_costs[to_stack_ind]
+
+
+                       if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                           visited_costs[new_state] = new_cost
+                           # The heuristic is the sum of the costs of moving the top block of each stack to an empty stack or a stack with blocks of the same shade
+                           h = heuristic(new_state, stack_costs)
+                           heapq.heappush(queue, (new_cost + h, new_cost, actions + [(from_stack_ind, to_stack_ind)], new_state))
+   return None
+
+
+
+
+def heuristic(state, stack_costs):
+   # The heuristic function can be the sum of the costs of moving the top block of each stack to an empty stack or a stack with blocks of the same shade
+   # This heuristic is admissible because it is greedy, always opting for the action that sorts the blocks the most, ensuring it never overestimates the cost to reach the goal
+   # The heuristic is consistent as the estimated cost of the next node is higher if a block is moved to a stack with a different shade, or equal or less by at most the cost of moving a block to the stack (equal to the cost of reaching the successor node, ie one action) as the maximum number of blocks that can be moved to a stack is by moving the block to an empty stack or a stack with blocks of the same shade, which is exactly the action taken in the heuristic. Thus h(n) can never be greater than c(n, n’)(equal to the cost of moving a block to the stack) + h(n’)
+   h = 0
+   for i in range(len(state)):
+       if state[i]:
+           # Find the stack with the lowest cost that is empty or has blocks of the same shade as the top block of the current stack
+           min_cost = min(stack_costs[j] for j in range(len(state)) if len(state[j]) < 4 and (not state[j] or state[j][-1] == state[i][-1]))
+           h += min_cost
+   return h
+
+
+print(a_star())
+```
+llm code run result: None
+
+
+
+ID: 3
+{'difficulty': 4, 'statement': "In 'Restricted Sorting', there are 6 stacks each with a capacity of 4 blocks, with 3 stacks filled with blocks of varying shades and the remaining are empty. The challenge is to sort the blocks by shade such that if a stack is not empty, it is stacked with 3 blocks of a single shade. The player can only transfer one block at a time from the top of a stack to an empty stack or to a stack that has only blocks of that shade, without exceeding the stacks’ capacity. Transferring blocks to certain stacks is more expensive than others. The cost of moving one block to the top of each stack is: {0: 3, 1: 6, 2: 5, 3: 6, 4: 1, 5: 1}, where the keys are the index of each stack, indexing from 0. The cost of moving a block is always at least 1. The solution should be a list of tuples, each containing, first, the index of the stack from which a block is picked up from and, second, the index of the stack to which it is transferred, indexing from 0. Given the initial state of the stacks, represented by the lists below (with the leftmost item being the shade of the topmost block in each stack)(and the first stack being the stack at index 0), what is the list of transfer pairs (reported in python syntax) with the least possible cost, that will result in all the blocks being correctly sorted? [[], ['Yellow', 'Green', 'Red', 'Red'], ['Blue', 'Green', 'Red', 'Green'], ['Yellow', 'Blue', 'Yellow', 'Blue'], [], []]", 'is_feasible': [[[], ['Yellow', 'Green', 'Red', 'Red'], ['Blue', 'Green', 'Red', 'Green'], ['Yellow', 'Blue', 'Yellow', 'Blue'], [], []], 4, {'0': 3, '1': 6, '2': 5, '3': 6, '4': 1, '5': 1}], 'is_correct': [[[], ['Yellow', 'Green', 'Red', 'Red'], ['Blue', 'Green', 'Red', 'Green'], ['Yellow', 'Blue', 'Yellow', 'Blue'], [], []], 4, {'0': 3, '1': 6, '2': 5, '3': 6, '4': 1, '5': 1}, 3], 'Astar': ["[[], ['Yellow', 'Green', 'Red', 'Red'], ['Blue', 'Green', 'Red', 'Green'], ['Yellow', 'Blue', 'Yellow', 'Blue'], [], []]", '{0: 3, 1: 6, 2: 5, 3: 6, 4: 1, 5: 1}', '4', '3'], 'opt': [[[1, 0], [1, 4], [2, 5], [2, 4], [2, 1], [3, 0], [3, 5], [3, 0], [2, 4], [3, 5]], 21, 0.11831974983215332]}
+Code passed constraints!! Complete code extractred, code is excutable and the type of the solution returned is correct!!
+```python
+import heapq
+
+
+def initialize():
+   # Define the initial state of the stacks as a tuple of tuples
+   initial_state = ((), ('Yellow', 'Green', 'Red', 'Red'), ('Blue', 'Green', 'Red', 'Green'), ('Yellow', 'Blue', 'Yellow', 'Blue'), (), ())
+   num_stacks = 6
+   stack_capacity = 4
+   # Define the cost of moving a block to each stack
+   stack_costs = {0: 3, 1: 6, 2: 5, 3: 6, 4: 1, 5: 1}
+
+
+   visited_costs = {}
+   visited_costs[initial_state] = 0
+
+
+   queue = [(0, 0, [], initial_state)]
+  
+   return initial_state, num_stacks, stack_capacity, stack_costs, visited_costs, queue
+  
+def a_star():
+  
+   initial_state, num_stacks, stack_capacity, stack_costs, visited_costs, queue = initialize()
+
+
+   while queue:
+       _, g, actions, state = heapq.heappop(queue)
+
+
+       # If all the stacks are empty or contain blocks of a single shade, return the actions taken
+       if all(len(stack) == 0 or len(set(stack)) == 1 for stack in state):
+           return actions
+
+
+       # Generate all possible actions from the current state, which includes moving the top block from any stack to any other stack
+       for from_stack_ind in range(num_stacks):
+           # Check if the stack has any blocks to move
+           if state[from_stack_ind]:
+               for to_stack_ind in range(num_stacks):
+                   # Check if the stack can accept more blocks and if the block can be moved to the stack
+                   if (len(state[to_stack_ind]) < stack_capacity and
+                       (not state[to_stack_ind] or state[to_stack_ind][-1] == state[from_stack_ind][-1])):
+                       # Generate the new state
+                       new_state = list(list(stack) for stack in state)
+                       block = new_state[from_stack_ind].pop()
+                       new_state[to_stack_ind].append(block)
+                       new_state = tuple(tuple(stack) for stack in new_state)
+                       # The cost of the new state is the cost of moving a block to the stack
+                       new_cost = g + stack_costs[to_stack_ind]
+
+
+                       if new_state not in visited_costs or new_cost < visited_costs[new_state]:
+                           visited_costs[new_state] = new_cost
+                           h = heuristic(new_state)
+                           heapq.heappush(queue, (new_cost + h, new_cost, actions + [(from_stack_ind, to_stack_ind)], new_state))
+   return None
+
+
+
+
+def heuristic(state):
+   # The heuristic function can be the sum of the number of blocks in each stack that are not of the same shade as the top block
+   # This heuristic is admissible because it presumes we can move the blocks to any stack, even if the stack is full or contains blocks of a different shade, thus reporting a lower cost estimate to reach the goal state
+   # The heuristic is consistent, ie non-decreasing along the path to the goal state, because the cost of moving a block from one stack to another is always at least 1, which is exactly the decrease in the heuristic value, if the block is moved to a stack with blocks of the same shade, otherwise the heuristic value of the successor node is the same or higher, and the heuristic estimate for the goal state is 0, as all the blocks in each stack are of the same shade in the goal state
+   h = 0
+   for stack in state:
+       if stack:
+           h += len([block for block in stack if block != stack[-1]])
+   return h
+
+
+print(a_star())
+```
+llm code run result: [(1, 4), (1, 4), (1, 5), (2, 5), (2, 4), (2, 5), (3, 0), (3, 1), (3, 0)]
+
+
+
+
+
+
+--------------------------------------------------
+model used
+--------------------------------------------------
+gpt_4
+
+
+--------------------------------------------------
+max tempreture in multiple try
+--------------------------------------------------
+0.5
+
+
+--------------------------------------------------
+max number of tries for each problem to get a valid code
+--------------------------------------------------
+50
+
+
+--------------------------------------------------
+number of easier problems we iterated through, a sum of 50 times, to get the A* code
+--------------------------------------------------
+10
+
+
+--------------------------------------------------
+number of calls made to the model. If less than 50 then equlas number of attempts to get a code that satisfies the given constraints
+--------------------------------------------------
+3

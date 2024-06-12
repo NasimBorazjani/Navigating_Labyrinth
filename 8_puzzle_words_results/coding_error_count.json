@@ -1,0 +1,56 @@
+{
+    "gpt_3.5_0shot_full_code": {
+        "Exceeded time limit. Killed": 61,
+        "IndexError": 14,
+        "ValueError": 6,
+        "TypeError": 6,
+        "NameError": 1,
+        "Returned None": 8,
+        "SyntaxError": 3,
+        "total problem count": 100
+    },
+    "gpt_3.5_2part_Astar": {
+        "Returned None": 34,
+        "Incorrect solution type": 7,
+        "IndexError": 7,
+        "SyntaxError": 1,
+        "NameError": 1,
+        "total problem count": 50
+    },
+    "gpt_3.5_Astar_code_reasoning_full_code": {
+        "Returned None": 20,
+        "IndexError": 57,
+        "Incomplete generation": 7,
+        "SyntaxError": 5,
+        "Incorrect solution type": 6,
+        "IndentationError": 3,
+        "Exceeded time limit. Killed": 2,
+        "total problem count": 100
+    },
+    "gpt_4_0shot_full_code": {
+        "Returned None": 53,
+        "TypeError": 23,
+        "Incorrect solution type": 7,
+        "Exceeded time limit. Killed": 6,
+        "IndexError": 5,
+        "ValueError": 1,
+        "total problem count": 100
+    },
+    "gpt_4_2part_Astar": {
+        "total problem count": 1
+    },
+    "gpt_4_2part_instances": {
+        "Returned None": 32,
+        "Exceeded time limit. Killed": 2,
+        "total problem count": 100
+    },
+    "gpt_4_Astar_code_reasoning_full_code": {
+        "Returned None": 56,
+        "Not feasible": 4,
+        "TypeError": 1,
+        "ValueError": 2,
+        "Incorrect solution type": 3,
+        "Exceeded time limit. Killed": 10,
+        "total problem count": 100
+    }
+}
