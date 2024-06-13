@@ -5,7 +5,7 @@ This repository includes SearchBench, a dataset  of state-based problems that re
 
 ## Requirements
 
-To install python requirements:
+To install python dependencies:
 
 ```setup
 pip install -r requirements.txt
