@@ -1,7 +1,6 @@
 
 import numpy as np
 import random
-import random
 
 def generate_3_grid(lower_range, upper_range, num_to_mask, seed):
     grid_generated = False

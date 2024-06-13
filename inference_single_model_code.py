@@ -1,6 +1,5 @@
 import os
 import subprocess
-from threading import Timer
 import time
 import ast
 import ast
@@ -12,6 +11,7 @@ from datetime import datetime
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import dataset
+import argparse
 
 
 stream = False
@@ -752,7 +752,7 @@ def record(id, log_file, llm_solution, problem, code_llm, report):
 
 def get_solutions(problems, model_name, log_file, 
                 problem_types_action_type, python_dir_name,
-                max_tokens, llm_execution_time_limit,
+                max_tokens, execution_time_limit,
                 llama_model, tokenizer, prompting_method,
                 print_stats, openai_key):
     count_feasible = 0
@@ -789,7 +789,7 @@ def get_solutions(problems, model_name, log_file,
 
             (llm_solution, killed, 
              not_executed, error_message,
-             execution_time) = run_code_solution(python_file, llm_execution_time_limit)
+             execution_time) = run_code_solution(python_file, execution_time_limit)
 
             #incorrect solution type or code is not executable or format of the llm solution does not fit the expected format:
             if error_message:
@@ -863,7 +863,7 @@ def import_from_path(module_name, path):
 
 
 def run_experiment(prompting_method, model_name, 
-                   problems, llm_execution_time_limit,
+                   problems, execution_time_limit,
                    max_tokens, problem_types_action_type, 
                    print_stats, openai_key):
 
@@ -906,7 +906,7 @@ def run_experiment(prompting_method, model_name,
      dict_llm_sol, dict_llm_compute_t,infeasible_ids,
      total_number_calls) = get_solutions(problems,model_name, log_file, 
                                         problem_types_action_type, python_dir_name,
-                                        max_tokens, llm_execution_time_limit,
+                                        max_tokens, execution_time_limit,
                                         llama_model, tokenizer, prompting_method, 
                                         print_stats, openai_key)
     
@@ -919,19 +919,69 @@ def run_experiment(prompting_method, model_name,
                 count_optimal, count_incomplete, count_killed, 
                 count_not_executed, dict_llm_sol, dict_llm_compute_t,
                 infeasible_ids, total_number_calls, num_problems,
-                llm_avg_compute_t, llm_execution_time_limit)
+                llm_avg_compute_t, execution_time_limit)
 
 
 
 def main():
-    prompting_method = "0shot_code"  # 0shot_code  A*  
-    model_name = "gpt4"  #gpt4 #gpt3.5 #llama
-    llm_execution_time_limit = 2200
-    problem_types = ["water_jug"]
-    all_problems = True
-    print_stats = True
-    path_to_searchbench = "SearchBench.jsonl"
-    openai_key = ""
+    parser = argparse.ArgumentParser(description="Evaluates a LLM on SearchBench problems using code-based single inference prompting methods: 0_shot code and A*.")
+
+    parser.add_argument(
+        '--prompting_method', 
+        choices=["0shot_code", "A*"], 
+        required=True,
+        help="The code-based single-inference prompt to use for evaluating the model on SearchBench. Options: '0shot_code', (4-shot) 'A*'."
+    )
+    
+    parser.add_argument(
+        '--model_name', 
+        choices=['gpt4', 'gpt3.5', 'code_llama'], 
+        default='gpt4', 
+        help="The LLM to evaluate on SearchBench. Options: 'gpt4', 'gpt3.5 (Turbo)', 'code_llama (Phind_34B)'."
+    )
+
+    parser.add_argument(
+        '--execution_time_limit', 
+        type=int, 
+        default=3300, 
+        help="Maximum time allowed for the LLM generated code to finish executing, in seconds."
+    )
+
+    parser.add_argument(
+        '--problem_types', 
+        nargs='+', 
+        choices=["8_puzzle", "8_puzzle_words", "coin_exchange", "water_jug", "color_sorting", "restricted_sorting", "magic_square", "consecutive_grid", "traffic", "city_directed_graph", "trampoline_matrix", "All"], 
+        default="All",
+        help="List of problem types in SearchBench to evaluate the model on. Use 'All' to evaluate on all problems in the dataset."
+    )
+
+    parser.add_argument(
+        '--print_stats', 
+        type=bool, 
+        default=True,
+        help="Flag to print the result of inference on each problem immediately after running the LLM generated code."
+    )
+
+    parser.add_argument(
+        '--path_to_searchbench', 
+        type=str, 
+        default="SearchBench.jsonl", 
+        help="Path to the JSONL file containing all of the problem instances. Default is 'SearchBench.jsonl'."
+    )
+
+    parser.add_argument(
+        '--openai_key', 
+        type=str, 
+        required=True,
+        help="Secret key for OpenAI API to run inference on GPT4 and GPT3.5. Pass an empty string if using Code Llama."
+    )
+
+    args = parser.parse_args()
+
+    if 'All' in args.problem_types:
+        all_problems = True
+    else:
+        all_problems = False
     
     max_tokens = 1800
 
@@ -939,14 +989,16 @@ def main():
                                 "coin_exchange": int, "water_jug": tuple, 
                                 "color_sorting": tuple, "restricted_sorting":tuple,
                                 "magic_square": tuple, "consecutive_grid": tuple,
-                                "traffic":tuple, "city_directed_graph":tuple, "trampoline_matrix":tuple}
+                                "traffic":tuple, "city_directed_graph":tuple, 
+                                "trampoline_matrix":tuple}
     
-    problems = dataset.get_problem_types(all_problems, problem_types, path_to_searchbench)[20:31]
+    problems = dataset.get_problem_types(all_problems, args.problem_types,
+                                         args.path_to_searchbench)
 
-    run_experiment(prompting_method, model_name,
-                   problems, llm_execution_time_limit,
+    run_experiment(args.prompting_method, args.model_name,
+                   problems, args.execution_time_limit,
                    max_tokens, problem_types_action_type, 
-                   print_stats, openai_key)
+                   args.print_stats, args.openai_key)
 
   
 main()      

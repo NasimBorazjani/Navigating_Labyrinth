@@ -5,6 +5,7 @@ import os
 import dataset
 import time
 import subprocess
+import argparse
 
 
 def run_code_solution(file_path, problem, execution_time_limit):
@@ -115,14 +116,37 @@ def import_from_path(module_name, path):
 
 
 def main():
-    Astar_execution_time_limit = 1
-    problem_type = "traffic"
-    print_stats = True
+    parser = argparse.ArgumentParser(description="Generates the optimal solution for new instances of the SearchBench dataset using a pre-implemented A* algorithm with an admissible and consistent heuristic.")
+    parser.add_argument(
+        '--Astar_execution_time_limit',
+        type=int,
+        default=600,
+        help="Run time limit for the pre-implemented A* algorithm to find the optimal solution, in seconds."
+    )
+    parser.add_argument(
+        '--problem_type',
+        choices=["8_puzzle", "8_puzzle_words", "coin_exchange", "water_jug", "color_sorting", "restricted_sorting", "magic_square", "consecutive_grid", "traffic", "city_directed_graph", "trampoline_matrix"],
+        required=True,
+        help="The problem type for which new instances are generated. The script calculates the optimal solution for instances of one problem type per run."    )
     
-    new_bench_file = "new_SearchBench.jsonl"
+    parser.add_argument(
+        '--print_stats',
+        type=bool,
+        default=True,
+        help="Flag to print the optimal solution to each instance after the A* algorithm finishes running."
+    )
+
+    parser.add_argument(
+        '--path_to_new_instances_jsonl',
+        type=str,
+        required=True,
+        help="Path to the new bench jsonl file that constains the new instances."
+    )
+    args = parser.parse_args()
     
-    get_opt_solutions(problem_type, Astar_execution_time_limit,
-                      new_bench_file, print_stats)
+    
+    get_opt_solutions(args.problem_type, args.Astar_execution_time_limit,
+                      args.path_to_new_instances_jsonl, args.print_stats)
   
 main()      
 

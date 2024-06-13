@@ -1,0 +1,7 @@
+astunparse
+openai
+numpy
+transformers
+torch
+nltk
+networkx

@@ -1,6 +1,5 @@
 import os
 import subprocess
-from threading import Timer
 import time
 import ast
 import astunparse
@@ -12,6 +11,7 @@ import dataset
 from datetime import datetime
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import argparse
 
 stream = False
 
@@ -1651,16 +1651,65 @@ def run_experiment(prompting_method, model_name, problem_type,
         f.write("Repeat_max was set to {}".format(repeat_max))
         f.close()
     
-    
+
 def main():
-    model_name = "gpt4"  #gpt4 #gpt3.5 #llama
-    execution_time_limit = 3200
-    problem_types = ["8_puzzle", "traffic"]
-    print_stats = False
-    path_to_searchbench = "SearchBench.jsonl"
-    openai_key = ""
+    parser = argparse.ArgumentParser(description="Evaluates a LLM on SearchBench problems using using MSMT A* prompting strategy.")
+
+    parser.add_argument(
+        '--model_name', 
+        choices=['gpt4', 'gpt3.5', 'code_llama'], 
+        default='gpt4', 
+        help="The LLM to evaluate on SearchBench. Options: 'gpt4', 'gpt3.5 (Turbo)', 'code_llama (Phind_34B)'."
+    )
+
+    parser.add_argument(
+        '--execution_time_limit', 
+        type=int, 
+        default=3200, 
+        help="Maximum time allowed for the LLM generated code to finish executing, in seconds."
+    )
+
+    parser.add_argument(
+        '--problem_types', 
+        nargs='+', 
+        choices=["8_puzzle", "8_puzzle_words", "coin_exchange", "water_jug", "color_sorting", "restricted_sorting", "magic_square", "consecutive_grid", "traffic", "city_directed_graph", "trampoline_matrix", "All"], 
+        default="All",
+        help="List of problem types in SearchBench to evaluate the model on. Use 'All' to evaluate on all problems in the dataset."
+    )
+
+    parser.add_argument(
+        '--print_stats', 
+        type=bool, 
+        default=True,
+        help="Flag to print the result of inference on each problem immediately after running the LLM generated code."
+    )
+
+    parser.add_argument(
+        '--path_to_searchbench', 
+        type=str, 
+        default="SearchBench.jsonl", 
+        help="Path to the JSONL file containing all of the problem instances. Default is 'SearchBench.jsonl'."
+    )
+
+    parser.add_argument(
+        '--openai_key', 
+        type=str, 
+        help="Secret key for OpenAI API to run inference on GPT4 and GPT3.5. Pass an empty string if using Code Llama."
+    )
+
+    args = parser.parse_args()
     
-    prompting_method = "A*_MSMT"  
+    # List of all eligible problem types
+    all_problem_types = ["8_puzzle", "8_puzzle_words", "coin_exchange",
+                         "water_jug", "color_sorting", "restricted_sorting",
+                         "magic_square", "consecutive_grid", "traffic", 
+                         "city_directed_graph", "trampoline_matrix"]
+
+    # If 'All' is in the problem_types, set it to all_problem_types
+    if 'All' in args.problem_types:
+        args.problem_types = all_problem_types
+        
+    prompting_method = "MSMT_A*"  
     max_tokens_astar = 1600
     max_tokens_initialize = 800
     repeat_max = 100
@@ -1674,7 +1723,7 @@ def main():
     
     llama_model = None
     tokenizer = None
-    if "llama" in model_name:    
+    if "llama" in args.model_name:    
         model_id = "Phind/Phind-CodeLlama-34B-v2"
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         
@@ -1694,9 +1743,9 @@ def main():
     if not os.path.exists(dir_name):
         os.makedirs(dir_name) 
     
-    for problem_type in problem_types:
+    for problem_type in args.problem_types:
         problems = dataset.get_problem_types(False, [problem_type], 
-                                             path_to_searchbench)[:11]
+                                             args.path_to_searchbench)
         problem_category = problems[0]["problem_category"]
         
         #1 -> implementation for 8_puzzle in puzzles category
@@ -1735,16 +1784,14 @@ def main():
         
         problem_action_type = problem_types_action_type[problem_type]
 
-        run_experiment(prompting_method, model_name, problem_type,
-                   problems, execution_time_limit, system_astar_prompt,
+        run_experiment(prompting_method, args.model_name, problem_type,
+                   problems, args.execution_time_limit, system_astar_prompt,
                    user_astar_prompt, system_initialize_prompt, 
                    user_initialize_prompt, max_tokens_astar, 
                    max_tokens_initialize, problem_action_type, 
-                   repeat_max, max_temp,num_problems_to_iterate, print_stats,
-                   openai_key,llama_model, tokenizer, dir_name)
-    
-
-main()
+                   repeat_max, max_temp,num_problems_to_iterate, args.print_stats,
+                   args.openai_key,llama_model, tokenizer, dir_name)
 
 
-    
+if __name__ == "__main__":
+    main()  
