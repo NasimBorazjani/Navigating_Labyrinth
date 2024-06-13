@@ -37,6 +37,7 @@ def create_dataset(min_number_nodes, max_number_nodes, num_problems):
                             "max_successor_states":num_nodes,
                             "num_vars_per_states":num_nodes + 3}
     
+    problems = {i:problems[i] for i in range(1, num_problems + 1)}
     return problems
 
 
